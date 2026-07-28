@@ -1,0 +1,81 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>event_seat</mat-icon>
+        Walk-In Customer Check-In
+      </mat-card-title>
+      <mat-card-subtitle>
+        Enter customer details and the system will assign the best available table.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" />
+          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phone" />
+          @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+            <mat-error>Phone number is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+            <mat-error>Email is required by the current backend</mat-error>
+          }
+          @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Number of People</mat-label>
+          <input matInput type="number" formControlName="numberOfGuests" min="1" />
+          @if (form.controls.numberOfGuests.hasError('required') && form.controls.numberOfGuests.touched) {
+            <mat-error>Number of people is required</mat-error>
+          }
+          @if (form.controls.numberOfGuests.hasError('min') && form.controls.numberOfGuests.touched) {
+            <mat-error>Number of people must be at least 1</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="assignment-card" [class.assignment-card--blocked]="suggestedTable() === null">
+          @if (suggestedTable(); as table) {
+            <div class="assignment-row">
+              <mat-icon>table_restaurant</mat-icon>
+              <div>
+                <strong>Assigned table:</strong> Table {{ table.tableNumber }}
+              </div>
+            </div>
+            <div class="assignment-row assignment-row--muted">
+              <span>Capacity {{ table.capacity }} | Status {{ table.status }}</span>
+            </div>
+          } @else {
+            <div class="assignment-row">
+              <mat-icon>warning</mat-icon>
+              <div>No available table currently matches this party size.</div>
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/dashboard">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
+            {{ submitting() ? 'Saving...' : 'Create Reservation' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

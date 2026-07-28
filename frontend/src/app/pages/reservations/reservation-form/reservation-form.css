@@ -1,0 +1,40 @@
+mat-card {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.assignment-card {
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #eef5ff;
+  border: 1px solid #c5d6f6;
+}
+
+.assignment-card--blocked {
+  background: #fff4eb;
+  border-color: #f2c79b;
+}
+
+.assignment-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.assignment-row--muted {
+  color: #5f6368;
+  margin-top: 8px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}

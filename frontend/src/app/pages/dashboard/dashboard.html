@@ -1,0 +1,77 @@
+<div class="page-container">
+  <h1 class="welcome-heading">
+    <mat-icon>dashboard</mat-icon>
+    Welcome, {{ userName }}
+  </h1>
+  <p class="role-badge">Role: {{ authService.getRole() }}</p>
+
+  <div class="card-grid">
+    @if (isCustomer) {
+      <mat-card class="nav-card" routerLink="/reservations/new">
+        <mat-card-content>
+          <mat-icon class="nav-icon reservations">event_seat</mat-icon>
+          <h3>Check In</h3>
+          <p>Enter your details and get an available table assignment</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="nav-card" routerLink="/menu">
+        <mat-card-content>
+          <mat-icon class="nav-icon menu">menu_book</mat-icon>
+          <h3>Menu</h3>
+          <p>Browse available menu items</p>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (!isCustomer) {
+    <mat-card class="nav-card" routerLink="/customers">
+      <mat-card-content>
+        <mat-icon class="nav-icon customers">people</mat-icon>
+        <h3>Customers</h3>
+        <p>View customer records</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="nav-card" routerLink="/waiters">
+      <mat-card-content>
+        <mat-icon class="nav-icon waiters">room_service</mat-icon>
+        <h3>Waiters</h3>
+        <p>Manage waiter staff</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="nav-card" routerLink="/tables">
+      <mat-card-content>
+        <mat-icon class="nav-icon tables">table_restaurant</mat-icon>
+        <h3>Tables</h3>
+        <p>Manage restaurant tables</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="nav-card" routerLink="/menu">
+      <mat-card-content>
+        <mat-icon class="nav-icon menu">menu_book</mat-icon>
+        <h3>Menu Items</h3>
+        <p>Manage menu and pricing</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="nav-card" routerLink="/reservations">
+      <mat-card-content>
+        <mat-icon class="nav-icon reservations">event_seat</mat-icon>
+        <h3>Reservations</h3>
+        <p>Manage table reservations</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="nav-card" routerLink="/orders">
+      <mat-card-content>
+        <mat-icon class="nav-icon orders">receipt_long</mat-icon>
+        <h3>Orders</h3>
+        <p>Manage restaurant orders</p>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+</div>

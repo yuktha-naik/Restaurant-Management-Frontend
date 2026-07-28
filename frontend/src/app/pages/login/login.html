@@ -1,0 +1,48 @@
+<div class="login-wrapper">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="login-icon">restaurant</mat-icon>
+        Restaurant Management System
+      </mat-card-title>
+      <mat-card-subtitle>Sign in to continue</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Your Name</mat-label>
+          <input
+            matInput
+            [(ngModel)]="name"
+            name="name"
+            required
+            placeholder="Enter your name"
+          />
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Role</mat-label>
+          <mat-select [(ngModel)]="role" name="role" required>
+            <mat-option value="CUSTOMER">Customer</mat-option>
+            <mat-option value="MANAGER">Manager</mat-option>
+            <mat-option value="WAITER">Waiter</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>badge</mat-icon>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width login-btn"
+          [disabled]="!name.trim()"
+        >
+          <mat-icon>login</mat-icon>
+          Sign In
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
