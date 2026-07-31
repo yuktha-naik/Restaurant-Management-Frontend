@@ -5,73 +5,65 @@
   </h1>
   <p class="role-badge">Role: {{ authService.getRole() }}</p>
 
-  <div class="card-grid">
-    @if (isCustomer) {
-      <mat-card class="nav-card" routerLink="/reservations/new">
+  @if (isCustomer) {
+    <div class="card-grid">
+      <mat-card class="stat-card" routerLink="/reservations/new">
         <mat-card-content>
-          <mat-icon class="nav-icon reservations">event_seat</mat-icon>
-          <h3>Check In</h3>
-          <p>Enter your details and get an available table assignment</p>
+          <mat-icon class="stat-icon" style="color:#9c27b0">event_seat</mat-icon>
+          <div class="stat-label">Check In</div>
+          <div class="stat-sub">Enter your details and get a table</div>
         </mat-card-content>
       </mat-card>
-
-      <mat-card class="nav-card" routerLink="/menu">
+      <mat-card class="stat-card" routerLink="/menu">
         <mat-card-content>
-          <mat-icon class="nav-icon menu">menu_book</mat-icon>
-          <h3>Menu</h3>
-          <p>Browse available menu items</p>
+          <mat-icon class="stat-icon" style="color:#ff5722">menu_book</mat-icon>
+          <div class="stat-label">Menu</div>
+          <div class="stat-sub">Browse available items</div>
         </mat-card-content>
       </mat-card>
+    </div>
+  }
+
+  @if (!isCustomer) {
+    @if (loading()) {
+      <div class="spinner-row">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Loading data...</span>
+      </div>
+    } @else if (backendOffline()) {
+      <div class="offline-banner">
+        <mat-icon class="offline-icon">cloud_off</mat-icon>
+        <div>
+          <strong>Backend is not reachable</strong>
+          <p>Make sure your Spring Boot server is running on <code>http://localhost:8080</code>, then click Retry.</p>
+        </div>
+        <button mat-raised-button color="primary" (click)="loadStats()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+      <div class="card-grid">
+        @for (card of stats(); track card.label) {
+          <mat-card class="stat-card" [routerLink]="card.route">
+            <mat-card-content>
+              <mat-icon class="stat-icon" [style.color]="card.color">{{ card.icon }}</mat-icon>
+              <div class="stat-count">{{ card.count }}</div>
+              <div class="stat-label">{{ card.label }}</div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    } @else {
+      <div class="card-grid">
+        @for (card of stats(); track card.label) {
+          <mat-card class="stat-card" [routerLink]="card.route">
+            <mat-card-content>
+              <mat-icon class="stat-icon" [style.color]="card.color">{{ card.icon }}</mat-icon>
+              <div class="stat-count">{{ card.count }}</div>
+              <div class="stat-label">{{ card.label }}</div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
     }
-
-    @if (!isCustomer) {
-    <mat-card class="nav-card" routerLink="/customers">
-      <mat-card-content>
-        <mat-icon class="nav-icon customers">people</mat-icon>
-        <h3>Customers</h3>
-        <p>View customer records</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="nav-card" routerLink="/waiters">
-      <mat-card-content>
-        <mat-icon class="nav-icon waiters">room_service</mat-icon>
-        <h3>Waiters</h3>
-        <p>Manage waiter staff</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="nav-card" routerLink="/tables">
-      <mat-card-content>
-        <mat-icon class="nav-icon tables">table_restaurant</mat-icon>
-        <h3>Tables</h3>
-        <p>Manage restaurant tables</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="nav-card" routerLink="/menu">
-      <mat-card-content>
-        <mat-icon class="nav-icon menu">menu_book</mat-icon>
-        <h3>Menu Items</h3>
-        <p>Manage menu and pricing</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="nav-card" routerLink="/reservations">
-      <mat-card-content>
-        <mat-icon class="nav-icon reservations">event_seat</mat-icon>
-        <h3>Reservations</h3>
-        <p>Manage table reservations</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="nav-card" routerLink="/orders">
-      <mat-card-content>
-        <mat-icon class="nav-icon orders">receipt_long</mat-icon>
-        <h3>Orders</h3>
-        <p>Manage restaurant orders</p>
-      </mat-card-content>
-    </mat-card>
-    }
-  </div>
+  }
 </div>

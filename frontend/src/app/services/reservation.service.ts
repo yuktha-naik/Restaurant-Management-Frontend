@@ -13,4 +13,20 @@ export class ReservationService {
   createReservation(reservation: Reservation): Observable<Reservation> {
     return this.http.post<Reservation>(this.baseUrl, reservation);
   }
+
+  getAllReservations(): Observable<Reservation[]> {
+    return this.http.get<Reservation[]>(this.baseUrl);
+  }
+
+  getReservationById(id: number): Observable<Reservation> {
+    return this.http.get<Reservation>(`${this.baseUrl}/${id}`);
+  }
+
+  updateReservation(id: number, reservation: Partial<Reservation>): Observable<Reservation> {
+    return this.http.put<Reservation>(`${this.baseUrl}/${id}`, reservation);
+  }
+
+  cancelReservation(id: number): Observable<string> {
+    return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
+  }
 }

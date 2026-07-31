@@ -1,0 +1,88 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>add</mat-icon> New Order
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Reservation</mat-label>
+          <mat-select formControlName="reservationId">
+            @for (r of reservations; track r.reservationId) {
+              <mat-option [value]="r.reservationId">
+                #{{ r.reservationId }} — {{ r.customer?.name }} ({{ r.status }})
+              </mat-option>
+            }
+          </mat-select>
+          @if (form.controls.reservationId.invalid && form.controls.reservationId.touched) {
+            <mat-error>Reservation is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Waiter</mat-label>
+          <mat-select formControlName="waiterId">
+            @for (w of waiters; track w.waiterId) {
+              <mat-option [value]="w.waiterId">{{ w.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.waiterId.invalid && form.controls.waiterId.touched) {
+            <mat-error>Waiter is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-divider></mat-divider>
+        <h3 class="items-heading">Order Items</h3>
+
+        <div formArrayName="orderItems">
+          @for (item of orderItemsArray.controls; track $index) {
+            <div [formGroupName]="$index" class="item-row">
+              <mat-form-field appearance="outline" class="item-field-lg">
+                <mat-label>Menu Item</mat-label>
+                <mat-select formControlName="itemId" (selectionChange)="onMenuItemSelected($index)">
+                  @for (m of menuItems; track m.itemId) {
+                    <mat-option [value]="m.itemId">{{ m.name }} ({{ m.price | currency }})</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-field-sm">
+                <mat-label>Qty</mat-label>
+                <input matInput type="number" formControlName="quantity" min="1" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-field-sm">
+                <mat-label>Unit Price</mat-label>
+                <input matInput type="number" step="0.01" formControlName="price" />
+              </mat-form-field>
+
+              <button mat-icon-button color="warn" type="button"
+                (click)="removeItem($index)" [disabled]="orderItemsArray.length === 1">
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <button mat-stroked-button type="button" (click)="addItem()">
+          <mat-icon>add</mat-icon> Add Item
+        </button>
+
+        <div class="total-row">
+          <strong>Total: {{ totalAmount | currency }}</strong>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
+            {{ submitting() ? 'Saving...' : 'Create Order' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

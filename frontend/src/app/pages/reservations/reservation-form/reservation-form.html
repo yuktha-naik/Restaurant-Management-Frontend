@@ -41,11 +41,11 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Number of People</mat-label>
-          <input matInput type="number" formControlName="numberOfGuests" min="1" />
-          @if (form.controls.numberOfGuests.hasError('required') && form.controls.numberOfGuests.touched) {
+          <input matInput type="number" formControlName="partySize" min="1" />
+          @if (form.controls.partySize.hasError('required') && form.controls.partySize.touched) {
             <mat-error>Number of people is required</mat-error>
           }
-          @if (form.controls.numberOfGuests.hasError('min') && form.controls.numberOfGuests.touched) {
+          @if (form.controls.partySize.hasError('min') && form.controls.partySize.touched) {
             <mat-error>Number of people must be at least 1</mat-error>
           }
         </mat-form-field>

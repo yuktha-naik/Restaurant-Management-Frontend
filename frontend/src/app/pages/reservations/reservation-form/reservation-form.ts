@@ -50,13 +50,19 @@ export class ReservationFormComponent {
     name: ['', [Validators.required]],
     phone: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    numberOfGuests: [1, [Validators.required, Validators.min(1)]],
+    partySize: [1, [Validators.required, Validators.min(1)]],
   });
 
   readonly suggestedTable = computed(() => {
-    const guestCount = this.form.controls.numberOfGuests.value;
-    return this.findBestFitTable(guestCount, this.availableTables());
-  });
+  const guestCount = this.form.controls.partySize.value;
+
+ 
+
+  return this.findBestFitTable(
+    guestCount,
+    this.availableTables()
+  );
+});
 
   constructor() {
     const user = this.authService.getUser();
@@ -67,16 +73,21 @@ export class ReservationFormComponent {
   }
 
   loadTables(): void {
-    this.restaurantTableService
-      .getAllTables()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (tables) => this.availableTables.set(tables),
-        error: () => {
-          this.snackBar.open('Failed to load available tables', 'Close', { duration: 3000 });
-        },
-      });
-  }
+  this.restaurantTableService
+    .getAllTables()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (tables) => {
+        
+        this.availableTables.set(tables);
+      },
+      error: () => {
+        this.snackBar.open('Failed to load available tables', 'Close', {
+          duration: 3000,
+        });
+      },
+    });
+}
 
   save(): void {
     this.form.markAllAsTouched();
@@ -101,12 +112,15 @@ export class ReservationFormComponent {
       .createCustomer(customerPayload)
       .pipe(
         switchMap((customer) => {
-          const reservationPayload: Reservation = {
-            reservationDate: this.toLocalDateTime(new Date()),
-            numberOfGuests: this.form.controls.numberOfGuests.value,
-            customer,
-            restaurantTable: { tableId: this.suggestedTable()!.tableId },
-          };
+          const reservationTime = new Date();
+reservationTime.setHours(reservationTime.getHours() + 1);
+
+const reservationPayload: Reservation = {
+  reservationDate: this.toLocalDateTime(reservationTime),
+  partySize: this.form.controls.partySize.value,
+  customer,
+  restaurantTable: { tableId: this.suggestedTable()!.tableId },
+};
 
           return this.reservationService.createReservation(reservationPayload);
         }),

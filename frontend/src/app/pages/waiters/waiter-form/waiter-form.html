@@ -1,0 +1,59 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Edit Waiter' : 'Add Waiter' }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" />
+          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone" />
+          @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+            <mat-error>Phone is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Assigned Manager</mat-label>
+          <mat-select formControlName="managerId">
+            @for (m of managers; track m.managerId) {
+              <mat-option [value]="m.managerId">{{ m.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
+            <mat-error>Manager is required</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit">
+            {{ isEditMode ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

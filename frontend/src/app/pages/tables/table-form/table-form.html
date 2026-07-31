@@ -1,0 +1,55 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Edit Table' : 'Add Table' }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Table Number</mat-label>
+          <input matInput type="number" formControlName="tableNumber" />
+          @if (form.controls.tableNumber.invalid && form.controls.tableNumber.touched) {
+            <mat-error>Table number must be ≥ 1</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Capacity</mat-label>
+          <input matInput type="number" formControlName="capacity" />
+          @if (form.controls.capacity.invalid && form.controls.capacity.touched) {
+            <mat-error>Capacity must be ≥ 1</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            @for (s of statuses; track s) {
+              <mat-option [value]="s">{{ s }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Assigned Waiter (optional)</mat-label>
+          <mat-select formControlName="waiterId">
+            <mat-option [value]="null">— None —</mat-option>
+            @for (w of waiters; track w.waiterId) {
+              <mat-option [value]="w.waiterId">{{ w.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit">
+            {{ isEditMode ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

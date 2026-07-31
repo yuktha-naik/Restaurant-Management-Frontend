@@ -13,4 +13,20 @@ export class RestaurantTableService {
   getAllTables(): Observable<RestaurantTable[]> {
     return this.http.get<RestaurantTable[]>(this.baseUrl);
   }
+
+  getTableById(id: number): Observable<RestaurantTable> {
+    return this.http.get<RestaurantTable>(`${this.baseUrl}/${id}`);
+  }
+
+  createTable(table: RestaurantTable): Observable<RestaurantTable> {
+    return this.http.post<RestaurantTable>(this.baseUrl, table);
+  }
+
+  updateTable(id: number, table: RestaurantTable): Observable<RestaurantTable> {
+    return this.http.put<RestaurantTable>(`${this.baseUrl}/${id}`, table);
+  }
+
+  deleteTable(id: number): Observable<string> {
+    return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
+  }
 }
