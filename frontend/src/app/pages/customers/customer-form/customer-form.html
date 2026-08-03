@@ -20,9 +20,6 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput formControlName="email" />
-          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
-            <mat-error>Email is required</mat-error>
-          }
           @if (form.controls.email.hasError('email') && form.controls.email.touched) {
             <mat-error>Enter a valid email address</mat-error>
           }
@@ -34,6 +31,11 @@
           @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
             <mat-error>Phone is required</mat-error>
           }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>City (optional)</mat-label>
+          <input matInput formControlName="city" />
         </mat-form-field>
 
         <div class="form-actions">

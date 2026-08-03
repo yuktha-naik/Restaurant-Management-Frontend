@@ -7,7 +7,7 @@ export interface RestaurantOrder {
   orderTime?: string;
   status?: OrderStatus;
   totalAmount?: number;
-  reservation: { reservationId: number };
-  waiter: { waiterId: number };
-  orderItems: OrderItem[];
+  reservation: { reservationId: number; [key: string]: unknown };
+  waiter: { waiterId: number; name?: string; [key: string]: unknown };
+  orderItems?: OrderItem[];
 }

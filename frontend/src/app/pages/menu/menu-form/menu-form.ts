@@ -52,7 +52,7 @@ export class MenuFormComponent {
     category: ['STARTER' as MenuCategory, Validators.required],
     price: [0, [Validators.required, Validators.min(0.01)]],
     available: [true],
-    managerId: [0 as number, Validators.required],
+    managerId: [0 as number, [Validators.required, Validators.min(1)]],
   });
 
   get isEditMode(): boolean {

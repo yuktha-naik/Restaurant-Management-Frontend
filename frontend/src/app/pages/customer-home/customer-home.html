@@ -1,0 +1,48 @@
+<div class="page-container">
+  <section class="hero">
+    <div>
+      <h1>Welcome, {{ welcomeName }}!</h1>
+      <p>Browse today&apos;s menu and reserve your table in seconds.</p>
+    </div>
+
+    <button mat-raised-button color="primary" routerLink="/reservations/new">
+      <mat-icon>event_seat</mat-icon>
+      Make Reservation
+    </button>
+  </section>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>menu_book</mat-icon>
+        Menu
+      </mat-card-title>
+      <mat-card-subtitle>Available items you can order at the restaurant</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <p>Loading menu...</p>
+      } @else if (menuItems().length === 0) {
+        <p>No menu items available right now.</p>
+      } @else {
+        <div class="menu-grid">
+          @for (item of menuItems(); track item.itemId ?? item.name) {
+            <article class="menu-item">
+              <div class="menu-item__head">
+                <h3>{{ item.name }}</h3>
+                <mat-chip [color]="item.available ? 'primary' : 'warn'" highlighted>
+                  {{ item.available ? 'Available' : 'Unavailable' }}
+                </mat-chip>
+              </div>
+
+              <p class="menu-item__meta">{{ item.category }}</p>
+              <p class="menu-item__price">{{ item.price | currency: 'INR' : 'symbol' : '1.0-2' }}</p>
+            </article>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
+

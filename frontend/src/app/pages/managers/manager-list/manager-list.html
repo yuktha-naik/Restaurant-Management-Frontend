@@ -1,0 +1,43 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Managers</mat-card-title>
+      <span class="spacer"></span>
+
+      @if (isManager) {
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="router.navigate(['/managers/new'])">
+
+          <mat-icon>add</mat-icon>
+          Add Manager
+
+        </button>
+      }
+    </mat-card-header>
+
+    <mat-card-content>
+
+  <table border="1" style="width:100%">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+    </tr>
+
+    @for (m of managers; track m.managerId) {
+      <tr>
+        <td>{{ m.managerId }}</td>
+        <td>{{ m.name }}</td>
+        <td>{{ m.email }}</td>
+        <td>{{ m.phone }}</td>
+      </tr>
+    }
+
+  </table>
+
+</mat-card-content>
+  </mat-card>
+</div>

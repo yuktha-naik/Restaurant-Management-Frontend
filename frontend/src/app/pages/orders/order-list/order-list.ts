@@ -1,4 +1,3 @@
-import { Component, DestroyRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
@@ -8,29 +7,45 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+
 import { RestaurantOrder } from '../../../models/restaurant-order';
 import { RestaurantOrderService } from '../../../services/restaurant-order.service';
 import { AuthService } from '../../../services/auth.service';
+
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  ChangeDetectorRef,
+  inject
+} from '@angular/core';
+
+import {
+  CommonModule,
+  CurrencyPipe,
+  DatePipe
+} from '@angular/common';
+
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
   imports: [
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatMenuModule,
-    MatSnackBarModule,
-    CurrencyPipe,
-    DatePipe,
-  ],
+  CommonModule,
+  MatTableModule,
+  MatButtonModule,
+  MatIconModule,
+  MatCardModule,
+  MatChipsModule,
+  MatMenuModule,
+  MatSnackBarModule,
+  CurrencyPipe,
+  DatePipe,
+],
   templateUrl: './order-list.html',
   styleUrl: './order-list.css',
 })
-export class OrderListComponent {
+export class OrderListComponent implements OnInit {
   displayedColumns = ['orderId', 'reservation', 'waiter', 'orderTime', 'status', 'total', 'actions'];
   orders: RestaurantOrder[] = [];
   loading = false;
@@ -39,13 +54,15 @@ export class OrderListComponent {
   readonly ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
   constructor(
-    private orderService: RestaurantOrderService,
-    private authService: AuthService,
-    public router: Router,
-    private snackBar: MatSnackBar,
-  ) {
-    this.loadOrders();
-  }
+  private orderService: RestaurantOrderService,
+  private authService: AuthService,
+  public router: Router,
+  private snackBar: MatSnackBar,
+  private cdr: ChangeDetectorRef,
+) {}
+ngOnInit(): void {
+  this.loadOrders();
+}
 
   get isWaiter(): boolean {
     return this.authService.isWaiter();
@@ -57,13 +74,15 @@ export class OrderListComponent {
 
   loadOrders(): void {
     this.loading = true;
+
     this.orderService
       .getAllOrders()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (orders) => {
-          this.orders = orders;
+          this.orders = [...orders];
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.loading = false;

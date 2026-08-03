@@ -5,55 +5,173 @@
   </span>
 
   @if (authService.isLoggedIn()) {
+
     <nav class="nav-links">
+
       <a mat-button routerLink="/dashboard" routerLinkActive="active-link">
-        <mat-icon>dashboard</mat-icon> Dashboard
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
       </a>
+
+      <!-- CUSTOMER -->
 
       @if (authService.isCustomer()) {
-        <a mat-button routerLink="/reservations/new" routerLinkActive="active-link">
-          <mat-icon>event_seat</mat-icon> Check In
+
+        <a mat-button
+           routerLink="/customer/home"
+           routerLinkActive="active-link">
+          <mat-icon>home</mat-icon>
+          Home
         </a>
+
+        <a mat-button
+           routerLink="/menu-items"
+           routerLinkActive="active-link">
+          <mat-icon>restaurant_menu</mat-icon>
+          Menu
+        </a>
+
+        <a mat-button
+           routerLink="/reservations/new"
+           routerLinkActive="active-link">
+          <mat-icon>event_seat</mat-icon>
+          Make Reservation
+        </a>
+
       }
 
-      @if (!authService.isCustomer()) {
-      <a mat-button routerLink="/customers" routerLinkActive="active-link">
-        <mat-icon>people</mat-icon> Customers
-      </a>
-      <a mat-button routerLink="/waiters" routerLinkActive="active-link">
-        <mat-icon>room_service</mat-icon> Waiters
-      </a>
-      <a mat-button routerLink="/tables" routerLinkActive="active-link">
-        <mat-icon>table_restaurant</mat-icon> Tables
-      </a>
-      <a mat-button routerLink="/menu" routerLinkActive="active-link">
-        <mat-icon>menu_book</mat-icon> Menu
-      </a>
-      <a mat-button routerLink="/reservations" routerLinkActive="active-link">
-        <mat-icon>event_seat</mat-icon> Reservations
-      </a>
-      <a mat-button routerLink="/orders" routerLinkActive="active-link">
-        <mat-icon>receipt_long</mat-icon> Orders
-      </a>
+      <!-- MANAGER -->
+
+      @if (authService.isManager()) {
+
+        <a mat-button
+           routerLink="/managers"
+           routerLinkActive="active-link">
+          <mat-icon>supervisor_account</mat-icon>
+          Managers
+        </a>
+
+        <a mat-button
+           routerLink="/customers"
+           routerLinkActive="active-link">
+          <mat-icon>people</mat-icon>
+          Customers
+        </a>
+
+        <a mat-button
+           routerLink="/waiters"
+           routerLinkActive="active-link">
+          <mat-icon>room_service</mat-icon>
+          Waiters
+        </a>
+
+        <a mat-button
+           routerLink="/tables"
+           routerLinkActive="active-link">
+          <mat-icon>table_restaurant</mat-icon>
+          Tables
+          </a>
+
+        <a mat-button
+           routerLink="/menu"
+           routerLinkActive="active-link">
+          <mat-icon>menu_book</mat-icon>
+          Menu
+        </a>
+
+        <a mat-button
+           routerLink="/reservations"
+           routerLinkActive="active-link">
+          <mat-icon>event_seat</mat-icon>
+          Reservations
+        </a>
+
+        <a mat-button
+           routerLink="/orders"
+           routerLinkActive="active-link">
+          <mat-icon>receipt_long</mat-icon>
+          Orders
+        </a>
+
+        <a mat-button
+           routerLink="/payments"
+           routerLinkActive="active-link">
+          <mat-icon>payments</mat-icon>
+          Payments
+        </a>
+
       }
+
+      <!-- WAITER -->
+
+      @if (authService.isWaiter()) {
+
+        <a mat-button
+           routerLink="/customers"
+           routerLinkActive="active-link">
+          <mat-icon>people</mat-icon>
+          Customers
+        </a>
+
+        <a mat-button
+           routerLink="/tables"
+           routerLinkActive="active-link">
+          <mat-icon>table_restaurant</mat-icon>
+          Tables
+        </a>
+
+        <a mat-button
+           routerLink="/menu"
+           routerLinkActive="active-link">
+          <mat-icon>menu_book</mat-icon>
+          Menu
+        </a>
+
+        <a mat-button
+           routerLink="/reservations"
+           routerLinkActive="active-link">
+          <mat-icon>event_seat</mat-icon>
+          Reservations
+        </a>
+
+        <a mat-button
+           routerLink="/orders"
+           routerLinkActive="active-link">
+          <mat-icon>receipt_long</mat-icon>
+          Orders
+        </a>
+
+        <a mat-button
+           routerLink="/payments"
+           routerLinkActive="active-link">
+          <mat-icon>payments</mat-icon>
+          Payments
+        </a>
+
+      }
+
     </nav>
 
     <span class="spacer"></span>
 
     <button mat-button [matMenuTriggerFor]="userMenu">
       <mat-icon>account_circle</mat-icon>
-      {{ authService.getUser()?.name }}
+      {{ authService.getIdentityLabel() }}
       <mat-icon>arrow_drop_down</mat-icon>
     </button>
+
     <mat-menu #userMenu="matMenu">
       <button mat-menu-item disabled>
         <mat-icon>badge</mat-icon>
         <span>{{ authService.getRole() }}</span>
       </button>
-      <button mat-menu-item (click)="authService.logout()">
+
+      <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Sign Out</span>
       </button>
     </mat-menu>
+
   }
+
 </mat-toolbar>

@@ -1,15 +1,56 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
-import { customerGuard } from './guards/customer.guard';
-import { managerGuard } from './guards/manager.guard';
+import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'customer', pathMatch: 'full' },
 
   {
-    path: 'login',
+    path: 'customer',
+    loadComponent: () =>
+      import('./pages/signup/signup').then((m) => m.SignupComponent),
+  },
+  {
+    path: 'customer/home',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CUSTOMER'] },
+    loadComponent: () =>
+      import('./pages/customer-home/customer-home').then((m) => m.CustomerHomeComponent),
+  },
+
+  {
+    path: 'signup',
+    redirectTo: 'customer',
+    pathMatch: 'full',
+  },
+
+  {
+    path: 'staff/login',
     loadComponent: () =>
       import('./pages/login/login').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'staff/manager',
+    loadComponent: () =>
+      import('./pages/login/login').then((m) => m.LoginComponent),
+    data: { staffRole: 'MANAGER' },
+  },
+  {
+    path: 'staff/waiter',
+    loadComponent: () =>
+      import('./pages/login/login').then((m) => m.LoginComponent),
+    data: { staffRole: 'WAITER' },
+  },
+  {
+    path: 'login',
+    redirectTo: 'staff/login',
+    pathMatch: 'full',
+  },
+
+  {
+    path: 'customer/login',
+    loadComponent: () =>
+      import('./pages/signup/signup').then((m) => m.SignupComponent),
   },
 
   // ── Protected shell ──────────────────────────────────────────────────────
@@ -23,7 +64,8 @@ export const routes: Routes = [
   // ── Customer check-in (CUSTOMER role only) ───────────────────────────────
   {
     path: 'reservations/new',
-    canActivate: [authGuard, customerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CUSTOMER', 'WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/reservations/reservation-form/reservation-form').then(
         (m) => m.ReservationFormComponent,
@@ -33,17 +75,66 @@ export const routes: Routes = [
   // ── Customers (Manager / Waiter view) ────────────────────────────────────
   {
     path: 'customers',
-    canActivate: [authGuard, managerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/customers/customer-list/customer-list').then(
         (m) => m.CustomerListComponent,
+      ),
+  },
+  {
+    path: 'customers/new',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
+    loadComponent: () =>
+      import('./pages/customers/customer-form/customer-form').then(
+        (m) => m.CustomerFormComponent,
+      ),
+  },
+  {
+    path: 'customers/:id/edit',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
+    loadComponent: () =>
+      import('./pages/customers/customer-form/customer-form').then(
+        (m) => m.CustomerFormComponent,
+      ),
+  },
+
+  // ── Managers (Manager only) ──────────────────────────────────────────────
+  {
+    path: 'managers',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
+    loadComponent: () =>
+      import('./pages/managers/manager-list/manager-list').then(
+        (m) => m.ManagerListComponent,
+      ),
+  },
+  {
+    path: 'managers/new',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
+    loadComponent: () =>
+      import('./pages/managers/manager-form/manager-form').then(
+        (m) => m.ManagerFormComponent,
+      ),
+  },
+  {
+    path: 'managers/:id/edit',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
+    loadComponent: () =>
+      import('./pages/managers/manager-form/manager-form').then(
+        (m) => m.ManagerFormComponent,
       ),
   },
 
   // ── Waiters ───────────────────────────────────────────────────────────────
   {
     path: 'waiters',
-    canActivate: [authGuard, managerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/waiters/waiter-list/waiter-list').then(
         (m) => m.WaiterListComponent,
@@ -51,7 +142,8 @@ export const routes: Routes = [
   },
   {
     path: 'waiters/new',
-    canActivate: [authGuard, managerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/waiters/waiter-form/waiter-form').then(
         (m) => m.WaiterFormComponent,
@@ -59,7 +151,8 @@ export const routes: Routes = [
   },
   {
     path: 'waiters/:id/edit',
-    canActivate: [authGuard, managerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/waiters/waiter-form/waiter-form').then(
         (m) => m.WaiterFormComponent,
@@ -69,7 +162,8 @@ export const routes: Routes = [
   // ── Tables ────────────────────────────────────────────────────────────────
   {
     path: 'tables',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/tables/table-list/table-list').then(
         (m) => m.TableListComponent,
@@ -77,7 +171,8 @@ export const routes: Routes = [
   },
   {
     path: 'tables/new',
-    canActivate: [authGuard, managerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
     loadComponent: () =>
       import('./pages/tables/table-form/table-form').then(
         (m) => m.TableFormComponent,
@@ -85,7 +180,8 @@ export const routes: Routes = [
   },
   {
     path: 'tables/:id/edit',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
     loadComponent: () =>
       import('./pages/tables/table-form/table-form').then(
         (m) => m.TableFormComponent,
@@ -94,28 +190,35 @@ export const routes: Routes = [
 
   // ── Menu ──────────────────────────────────────────────────────────────────
   {
-    path: 'menu',
-    canActivate: [authGuard],
+    path: 'menu-items',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CUSTOMER', 'WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/menu/menu-list/menu-list').then((m) => m.MenuListComponent),
   },
+  { path: 'menu', redirectTo: 'menu-items', pathMatch: 'full' },
   {
-    path: 'menu/new',
-    canActivate: [authGuard, managerGuard],
+    path: 'menu-items/new',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
     loadComponent: () =>
       import('./pages/menu/menu-form/menu-form').then((m) => m.MenuFormComponent),
   },
+  { path: 'menu/new', redirectTo: 'menu-items/new', pathMatch: 'full' },
   {
-    path: 'menu/:id/edit',
-    canActivate: [authGuard, managerGuard],
+    path: 'menu-items/:id/edit',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['MANAGER'] },
     loadComponent: () =>
       import('./pages/menu/menu-form/menu-form').then((m) => m.MenuFormComponent),
   },
+  { path: 'menu/:id/edit', redirectTo: 'menu-items/:id/edit', pathMatch: 'full' },
 
   // ── Reservations ──────────────────────────────────────────────────────────
   {
     path: 'reservations',
-    canActivate: [authGuard, managerGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CUSTOMER', 'WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/reservations/reservation-list/reservation-list').then(
         (m) => m.ReservationListComponent,
@@ -125,7 +228,8 @@ export const routes: Routes = [
   // ── Orders ────────────────────────────────────────────────────────────────
   {
     path: 'orders',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/orders/order-list/order-list').then(
         (m) => m.OrderListComponent,
@@ -133,13 +237,42 @@ export const routes: Routes = [
   },
   {
     path: 'orders/new',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
     loadComponent: () =>
       import('./pages/orders/order-form/order-form').then(
         (m) => m.OrderFormComponent,
       ),
   },
 
-  { path: '**', redirectTo: 'dashboard' },
-];
+  // ── Payments ──────────────────────────────────────────────────────────────
+  {
+    path: 'payments',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
+    loadComponent: () =>
+      import('./pages/payments/payment-list/payment-list').then(
+        (m) => m.PaymentListComponent,
+      ),
+  },
+  {
+    path: 'payments/new',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
+    loadComponent: () =>
+      import('./pages/payments/payment-form/payment-form').then(
+        (m) => m.PaymentFormComponent,
+      ),
+  },
+  {
+    path: 'payments/:id/edit',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
+    loadComponent: () =>
+      import('./pages/payments/payment-form/payment-form').then(
+        (m) => m.PaymentFormComponent,
+      ),
+  },
 
+  { path: '**', redirectTo: 'customer' },
+];

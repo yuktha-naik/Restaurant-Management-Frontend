@@ -1,0 +1,104 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Payments</mat-card-title>
+
+      <span class="spacer"></span>
+
+      @if (isManagerOrWaiter) {
+      <button mat-raised-button color="primary" (click)="addPayment()">
+        <mat-icon>add</mat-icon>
+        Add Payment
+      </button>
+      }
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading) {
+      <p>Loading payments...</p>
+      } @else {
+
+      <table mat-table [dataSource]="payments" class="full-width">
+
+        <ng-container matColumnDef="paymentId">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let p">{{ p.paymentId }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="orderId">
+          <th mat-header-cell *matHeaderCellDef>Order</th>
+          <td mat-cell *matCellDef="let p">
+            {{ p.restaurantOrder?.orderId }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let p">
+            {{ p.amount | currency }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="method">
+          <th mat-header-cell *matHeaderCellDef>Method</th>
+          <td mat-cell *matCellDef="let p">
+            {{ p.paymentMethod }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let p">
+            {{ p.status }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="time">
+          <th mat-header-cell *matHeaderCellDef>Time</th>
+          <td mat-cell *matCellDef="let p">
+            {{ p.paymentTime ? (p.paymentTime | date:'short') : '—' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+
+          <td mat-cell *matCellDef="let p">
+
+            @if (isManagerOrWaiter && p.status === 'PENDING' && p.paymentId) {
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="confirmPayment(p.paymentId)"
+              title="Confirm Payment">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            }
+
+            @if (isManagerOrWaiter && p.paymentId) {
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="editPayment(p.paymentId)">
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="deletePayment(p.paymentId)">
+              <mat-icon>delete</mat-icon>
+            </button>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      </table>
+
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

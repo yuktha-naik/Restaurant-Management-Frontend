@@ -37,8 +37,9 @@ export class CustomerFormComponent {
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.email]],
     phone: ['', [Validators.required]],
+    city: [''],
   });
 
   get isEditMode(): boolean {
@@ -57,7 +58,13 @@ export class CustomerFormComponent {
       .getCustomerById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (customer) => this.form.patchValue(customer),
+        next: (customer) =>
+          this.form.patchValue({
+            name: customer.name,
+            email: customer.email ?? '',
+            phone: customer.phone,
+            city: customer.city ?? '',
+          }),
         error: () => {
           this.snackBar.open('Failed to load customer details', 'Close', { duration: 3000 });
           this.router.navigate(['/customers']);
@@ -69,7 +76,13 @@ export class CustomerFormComponent {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const payload: Customer = this.form.getRawValue();
+    const { name, email, phone, city } = this.form.getRawValue();
+    const payload: Customer = {
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() ? email.trim() : null,
+      city: city.trim() ? city.trim() : undefined,
+    };
 
     if (this.isEditMode) {
       this.customerService

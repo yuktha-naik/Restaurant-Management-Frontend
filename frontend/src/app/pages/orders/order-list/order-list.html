@@ -3,7 +3,7 @@
     <mat-card-header>
       <mat-card-title>Orders</mat-card-title>
       <span class="spacer"></span>
-      @if (isWaiter) {
+      @if (isWaiter || isManager) {
         <button mat-raised-button color="primary" (click)="router.navigate(['/orders/new'])">
           <mat-icon>add</mat-icon> New Order
         </button>
@@ -42,7 +42,7 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let o">
-              @if (isWaiter) {
+              @if (isWaiter || isManager) {
                 <button mat-icon-button [matMenuTriggerFor]="statusMenu"
                   title="Change status"><mat-icon>more_vert</mat-icon></button>
                 <mat-menu #statusMenu="matMenu">
@@ -51,7 +51,7 @@
                   }
                 </mat-menu>
               }
-              @if (isManager && o.orderId) {
+              @if ((isManager || isWaiter) && o.orderId) {
                 <button mat-icon-button color="warn" (click)="delete(o.orderId)">
                   <mat-icon>delete</mat-icon>
                 </button>

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,22 +11,27 @@ import { Reservation, ReservationStatus } from '../../../models/reservation';
 import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
 
+import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
+
+  
 @Component({
   selector: 'app-reservation-list',
   standalone: true,
-  imports: [
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatSnackBarModule,
-    DatePipe,
-  ],
+ imports: [
+  CommonModule,
+  MatTableModule,
+  MatButtonModule,
+  MatIconModule,
+  MatCardModule,
+  MatChipsModule,
+  MatSnackBarModule,
+  DatePipe,
+],
   templateUrl: './reservation-list.html',
   styleUrl: './reservation-list.css',
 })
-export class ReservationListComponent {
+export class ReservationListComponent implements OnInit {
   displayedColumns = [
     'reservationId',
     'customer',
@@ -39,36 +44,62 @@ export class ReservationListComponent {
   reservations: Reservation[] = [];
   loading = false;
 
+  get canManageStatus(): boolean {
+    const role = this.authService.getRole();
+    return role === 'MANAGER';
+  }
+
+  get canCancelReservation(): boolean {
+    return this.authService.getRole() !== 'WAITER';
+  }
+
+  customerLabel(r: Reservation): string {
+    return r.customer?.name ?? (r.customer?.customerId != null ? `#${r.customer.customerId}` : '—');
+  }
+
+  tableLabel(r: Reservation): string {
+    const t = r.restaurantTable;
+    if (!t) return 'Auto';
+    return t.tableNumber != null ? `Table ${t.tableNumber}` : (t.tableId != null ? `#${t.tableId}` : 'Auto');
+  }
+
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
-    private reservationService: ReservationService,
-    private authService: AuthService,
-    private snackBar: MatSnackBar,
-  ) {
-    this.loadReservations();
-  }
+  private reservationService: ReservationService,
+  private authService: AuthService,
+  private snackBar: MatSnackBar,
+  private cdr: ChangeDetectorRef,
+) {}
 
-  get isManagerOrWaiter(): boolean {
-    return this.authService.isManager() || this.authService.isWaiter();
-  }
+ngOnInit(): void {
+  this.loadReservations();
+}
 
-  loadReservations(): void {
-    this.loading = true;
-    this.reservationService
-      .getAllReservations()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (r) => {
-          this.reservations = r;
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-          this.snackBar.open('Failed to load reservations', 'Close', { duration: 3000 });
-        },
-      });
-  }
+loadReservations(): void {
+  this.loading = true;
+
+  this.reservationService
+    .getAllReservations()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (reservations) => {
+        this.reservations = [...reservations];
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+
+        this.snackBar.open(
+          'Failed to load reservations',
+          'Close',
+          { duration: 3000 }
+        );
+      },
+    });
+}
+
 
   updateStatus(reservation: Reservation, status: ReservationStatus): void {
     if (!reservation.reservationId) return;
@@ -85,7 +116,8 @@ export class ReservationListComponent {
       });
   }
 
-  cancel(reservationId: number): void {
+  cancel(reservationId: number | undefined): void {
+    if (!reservationId) return;
     if (!confirm('Cancel this reservation? The table will be freed.')) return;
     this.reservationService
       .cancelReservation(reservationId)
@@ -99,7 +131,7 @@ export class ReservationListComponent {
       });
   }
 
-  statusColor(status: string): string {
+  statusColor(status: string | undefined): 'primary' | 'warn' | 'accent' {
     if (status === 'CONFIRMED') return 'primary';
     if (status === 'CANCELLED') return 'warn';
     return 'accent';

@@ -1,11 +1,20 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  ChangeDetectorRef,
+  inject,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 import { Waiter } from '../../../models/waiter';
 import { WaiterService } from '../../../services/waiter.service';
 import { AuthService } from '../../../services/auth.service';
@@ -14,6 +23,7 @@ import { AuthService } from '../../../services/auth.service';
   selector: 'app-waiter-list',
   standalone: true,
   imports: [
+    CommonModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -23,8 +33,9 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './waiter-list.html',
   styleUrl: './waiter-list.css',
 })
-export class WaiterListComponent {
+export class WaiterListComponent implements OnInit {
   displayedColumns = ['waiterId', 'name', 'email', 'phone', 'actions'];
+
   waiters: Waiter[] = [];
   loading = false;
 
@@ -35,7 +46,10 @@ export class WaiterListComponent {
     private authService: AuthService,
     public router: Router,
     private snackBar: MatSnackBar,
-  ) {
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
     this.loadWaiters();
   }
 
@@ -45,17 +59,31 @@ export class WaiterListComponent {
 
   loadWaiters(): void {
     this.loading = true;
+
     this.waiterService
       .getAllWaiters()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (waiters) => {
-          this.waiters = waiters;
+          console.log('WAITERS RESPONSE:', waiters);
+
+          this.waiters = [...waiters];
           this.loading = false;
+
+          this.cdr.detectChanges();
+
+          console.log('WAITER COUNT:', this.waiters.length);
         },
-        error: () => {
+        error: (err) => {
+          console.error('WAITER ERROR:', err);
+
           this.loading = false;
-          this.snackBar.open('Failed to load waiters', 'Close', { duration: 3000 });
+
+          this.snackBar.open(
+            'Failed to load waiters',
+            'Close',
+            { duration: 3000 }
+          );
         },
       });
   }
@@ -65,16 +93,30 @@ export class WaiterListComponent {
   }
 
   delete(waiterId: number): void {
-    if (!confirm('Delete this waiter?')) return;
+    if (!confirm('Delete this waiter?')) {
+      return;
+    }
+
     this.waiterService
       .deleteWaiter(waiterId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.snackBar.open('Waiter deleted', 'Close', { duration: 2500 });
+          this.snackBar.open(
+            'Waiter deleted',
+            'Close',
+            { duration: 2500 }
+          );
+
           this.loadWaiters();
         },
-        error: () => this.snackBar.open('Failed to delete waiter', 'Close', { duration: 3000 }),
+        error: () => {
+          this.snackBar.open(
+            'Failed to delete waiter',
+            'Close',
+            { duration: 3000 }
+          );
+        },
       });
   }
 }

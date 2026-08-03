@@ -2,8 +2,9 @@ export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 
 export interface Payment {
   paymentId?: number;
-  amount?: number;
+  amount: number;
   paymentTime?: string;
-  status?: PaymentStatus;
-  paymentMethod?: string;
+  status: PaymentStatus;
+  paymentMethod: string;
+  restaurantOrder: { orderId: number };
 }

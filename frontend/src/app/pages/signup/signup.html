@@ -1,0 +1,66 @@
+<div class="login-wrapper">
+  <mat-card class="login-card">
+    <div class="portal-switch">
+      <button mat-flat-button type="button" routerLink="/customer">Customer</button>
+      <button mat-stroked-button type="button" routerLink="/staff/manager">Manager</button>
+      <button mat-stroked-button type="button" routerLink="/staff/waiter">Waiter</button>
+    </div>
+
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="login-icon">restaurant</mat-icon>
+        Customer Check-In
+      </mat-card-title>
+      <mat-card-subtitle>
+        Enter your phone to continue (new or returning customer)
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" />
+          <mat-icon matSuffix>person</mat-icon>
+          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone" placeholder="10-digit number" />
+          <mat-icon matSuffix>phone</mat-icon>
+          @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+            <mat-error>Phone is required</mat-error>
+          }
+          @if (form.controls.phone.hasError('pattern') && form.controls.phone.touched) {
+            <mat-error>Enter a valid 10-digit phone number</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>City (optional)</mat-label>
+          <input matInput formControlName="city" />
+          <mat-icon matSuffix>location_city</mat-icon>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width login-btn"
+          [disabled]="submitting()">
+          <mat-icon>login</mat-icon>
+          {{ submitting() ? 'Please wait...' : 'Continue as Customer' }}
+        </button>
+
+        <p class="alt-link">
+          Staff member? <a routerLink="/staff/login">Use staff sign in</a>
+        </p>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

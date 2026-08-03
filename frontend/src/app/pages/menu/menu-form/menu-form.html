@@ -43,6 +43,9 @@
           @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
             <mat-error>Manager is required</mat-error>
           }
+          @if (form.controls.managerId.hasError('min') && form.controls.managerId.touched) {
+            <mat-error>Please select a manager</mat-error>
+          }
         </mat-form-field>
 
         <div class="available-row">

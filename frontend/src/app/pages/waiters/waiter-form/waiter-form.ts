@@ -46,7 +46,8 @@ export class WaiterFormComponent {
     name: ['', Validators.required],
     phone: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    managerId: [0 as number, Validators.required],
+    managerId: [0 as number, [Validators.required, Validators.min(1)]],
+    password: [''],
   });
 
   get isEditMode(): boolean {
@@ -55,7 +56,12 @@ export class WaiterFormComponent {
 
   constructor() {
     this.loadManagers();
-    if (this.isEditMode) this.loadWaiter();
+    if (this.isEditMode) {
+      this.loadWaiter();
+    } else {
+      this.form.controls.password.setValidators([Validators.required, Validators.minLength(4)]);
+      this.form.controls.password.updateValueAndValidity();
+    }
   }
 
   loadManagers(): void {
@@ -88,8 +94,11 @@ export class WaiterFormComponent {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const { name, phone, email, managerId } = this.form.getRawValue();
+    const { name, phone, email, managerId, password } = this.form.getRawValue();
     const payload: Waiter = { name, phone, email, manager: { managerId } };
+    if (!this.isEditMode) {
+      payload.password = password;
+    }
 
     const request$ = this.isEditMode
       ? this.waiterService.updateWaiter(Number(this.waiterId), payload)

@@ -6,4 +6,5 @@ export interface Waiter {
   phone: string;
   email: string;
   manager: Pick<Manager, 'managerId'>;
+  password?: string;
 }

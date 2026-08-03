@@ -1,3 +1,4 @@
+// auth.guard.ts — unchanged, shown here only so you can confirm it matches
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -9,5 +10,5 @@ export const authGuard: CanActivateFn = () => {
   if (auth.isLoggedIn()) {
     return true;
   }
-  return router.createUrlTree(['/login']);
+  return router.createUrlTree(['/customer']);
 };

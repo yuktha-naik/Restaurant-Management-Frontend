@@ -1,35 +1,66 @@
 <div class="login-wrapper">
   <mat-card class="login-card">
+    <div class="portal-switch">
+      <button mat-stroked-button type="button" routerLink="/customer">Customer</button>
+      <button mat-flat-button type="button" routerLink="/staff/manager">Manager</button>
+      <button mat-flat-button type="button" routerLink="/staff/waiter">Waiter</button>
+    </div>
+
     <mat-card-header>
       <mat-card-title>
         <mat-icon class="login-icon">restaurant</mat-icon>
-        Restaurant Management System
+        {{ portalTitle() }}
       </mat-card-title>
-      <mat-card-subtitle>Sign in to continue</mat-card-subtitle>
+      <mat-card-subtitle>
+        {{ portalSubtitle() }}
+      </mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
-      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+      <form [formGroup]="form" (ngSubmit)="onLogin()">
+
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Your Name</mat-label>
+          <mat-label>Email</mat-label>
+
           <input
             matInput
-            [(ngModel)]="name"
-            name="name"
-            required
-            placeholder="Enter your name"
-          />
-          <mat-icon matSuffix>person</mat-icon>
+            formControlName="email"
+            type="email"
+            placeholder="you@example.com">
+
+          <mat-icon matSuffix>email</mat-icon>
+
+          @if (
+            form.controls['email'].hasError('required') &&
+            form.controls['email'].touched
+          ) {
+            <mat-error>Email is required</mat-error>
+          }
+
+          @if (
+            form.controls['email'].hasError('email') &&
+            form.controls['email'].touched
+          ) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Role</mat-label>
-          <mat-select [(ngModel)]="role" name="role" required>
-            <mat-option value="CUSTOMER">Customer</mat-option>
-            <mat-option value="MANAGER">Manager</mat-option>
-            <mat-option value="WAITER">Waiter</mat-option>
-          </mat-select>
-          <mat-icon matSuffix>badge</mat-icon>
+          <mat-label>Password</mat-label>
+
+          <input
+            matInput
+            formControlName="password"
+            type="password">
+
+          <mat-icon matSuffix>lock</mat-icon>
+
+          @if (
+            form.controls['password'].hasError('required') &&
+            form.controls['password'].touched
+          ) {
+            <mat-error>Password is required</mat-error>
+          }
         </mat-form-field>
 
         <button
@@ -37,11 +68,18 @@
           color="primary"
           type="submit"
           class="full-width login-btn"
-          [disabled]="!name.trim()"
-        >
+          [disabled]="form.invalid || submitting()">
+
           <mat-icon>login</mat-icon>
-          Sign In
+
+          {{ submitting() ? 'Signing in...' : 'Sign In' }}
+
         </button>
+
+        <p class="alt-link">
+          Walk-in customer? <a routerLink="/customer">Use phone check-in</a>
+        </p>
+
       </form>
     </mat-card-content>
   </mat-card>

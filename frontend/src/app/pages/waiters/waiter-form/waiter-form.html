@@ -45,7 +45,23 @@
           @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
             <mat-error>Manager is required</mat-error>
           }
+          @if (form.controls.managerId.hasError('min') && form.controls.managerId.touched) {
+            <mat-error>Please select a manager</mat-error>
+          }
         </mat-form-field>
+
+        @if (!isEditMode) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" />
+            @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+              <mat-error>Password is required</mat-error>
+            }
+            @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
+              <mat-error>Password must be at least 4 characters</mat-error>
+            }
+          </mat-form-field>
+        }
 
         <div class="form-actions">
           <button mat-button type="button" (click)="cancel()">Cancel</button>

@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
@@ -10,14 +10,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Reservation } from '../../../models/reservation';
 import { Waiter } from '../../../models/waiter';
 import { MenuItem } from '../../../models/menu-item';
 import { RestaurantOrder } from '../../../models/restaurant-order';
+import { OrderItem } from '../../../models/order-item';
 import { ReservationService } from '../../../services/reservation.service';
 import { WaiterService } from '../../../services/waiter.service';
 import { MenuItemService } from '../../../services/menu-item.service';
+import { OrderItemService } from '../../../services/order-item.service';
 import { RestaurantOrderService } from '../../../services/restaurant-order.service';
 import { AuthService } from '../../../services/auth.service';
 
@@ -27,6 +29,7 @@ import { AuthService } from '../../../services/auth.service';
   imports: [
     ReactiveFormsModule,
     CurrencyPipe,
+    DatePipe,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -46,117 +49,246 @@ export class OrderFormComponent {
   private readonly reservationService = inject(ReservationService);
   private readonly waiterService = inject(WaiterService);
   private readonly menuService = inject(MenuItemService);
+  private readonly orderItemService = inject(OrderItemService);
   private readonly orderService = inject(RestaurantOrderService);
   private readonly authService = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);
 
-  reservations: Reservation[] = [];
-  waiters: Waiter[] = [];
-  menuItems: MenuItem[] = [];
-  readonly submitting = signal(false);
+  readonly loading = signal(true);
+  readonly creatingOrder = signal(false);
+  readonly mutatingItem = signal(false);
+  readonly reservations = signal<Reservation[]>([]);
+  readonly waiters = signal<Waiter[]>([]);
+  readonly menuItems = signal<MenuItem[]>([]);
+  readonly createdOrder = signal<RestaurantOrder | null>(null);
+  readonly currentItems = signal<OrderItem[]>([]);
 
-  get totalAmount(): number {
-    return this.orderItemsArray.controls.reduce((sum, ctrl) => {
-      const qty: number = ctrl.get('quantity')?.value ?? 0;
-      const price: number = ctrl.get('price')?.value ?? 0;
-      return sum + qty * price;
-    }, 0);
-  }
-
-  readonly form = this.fb.nonNullable.group({
+  readonly createOrderForm = this.fb.nonNullable.group({
     reservationId: [0 as number, [Validators.required, Validators.min(1)]],
     waiterId: [0 as number, [Validators.required, Validators.min(1)]],
-    orderItems: this.fb.array([this.buildItemRow()]),
   });
 
-  get orderItemsArray(): FormArray {
-    return this.form.controls.orderItems as FormArray;
-  }
+  readonly addItemForm = this.fb.nonNullable.group({
+    itemId: [0 as number, [Validators.required, Validators.min(1)]],
+    quantity: [1, [Validators.required, Validators.min(1)]],
+  });
+
+  readonly canCreateOrder = computed(() => !this.createdOrder() && !this.creatingOrder());
+  readonly canAddItems = computed(() => !!this.createdOrder() && !this.mutatingItem());
+  readonly confirmedReservations = computed(() =>
+    this.reservations().filter((r) => r.status === 'CONFIRMED' && !!r.restaurantTable),
+  );
+  readonly selectedReservation = computed(() => {
+    const selectedId = this.createOrderForm.controls.reservationId.value;
+    return this.confirmedReservations().find((r) => r.reservationId === selectedId) ?? null;
+  });
 
   constructor() {
-    this.loadDropdowns();
+    this.loadSeedData();
   }
 
-  private buildItemRow() {
-    return this.fb.nonNullable.group({
-      itemId: [0 as number, [Validators.required, Validators.min(1)]],
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      price: [0, [Validators.required, Validators.min(0.01)]],
-    });
+  get isWaiter(): boolean {
+    return this.authService.isWaiter();
   }
 
-  loadDropdowns(): void {
+  private loadSeedData(): void {
+    this.loading.set(true);
+
     this.reservationService
       .getAllReservations()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (r) => (this.reservations = r) });
+      .subscribe({
+        next: (reservations) => this.reservations.set(reservations),
+        error: () => {
+          this.loading.set(false);
+          this.snackBar.open('Failed to load reservations', 'Close', { duration: 3000 });
+        },
+      });
 
     this.waiterService
       .getAllWaiters()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (w) => (this.waiters = w) });
+      .subscribe({
+        next: (waiters) => {
+          this.waiters.set(waiters);
+          if (this.authService.isWaiter()) {
+            const currentUserId = this.authService.getUserId();
+            const self = waiters.find((w) => w.waiterId === currentUserId);
+            if (self?.waiterId) {
+              this.createOrderForm.controls.waiterId.setValue(self.waiterId);
+            }
+          }
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+          this.snackBar.open('Failed to load waiters', 'Close', { duration: 3000 });
+        },
+      });
 
     this.menuService
       .getAllMenuItems()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (m) => (this.menuItems = m.filter((i) => i.available)) });
+      .subscribe({
+        next: (menuItems) => {
+          this.menuItems.set(menuItems.filter((m) => m.available));
+        },
+        error: () => {
+          this.snackBar.open('Failed to load menu items', 'Close', { duration: 3000 });
+        },
+      });
   }
 
-  onMenuItemSelected(rowIndex: number): void {
-    const row = this.orderItemsArray.at(rowIndex);
-    const itemId: number = row.get('itemId')?.value ?? 0;
-    const menuItem = this.menuItems.find((i) => i.itemId === itemId);
-    if (menuItem) {
-      row.patchValue({ price: menuItem.price });
+  createOrder(): void {
+    this.createOrderForm.markAllAsTouched();
+    if (this.createOrderForm.invalid || !this.canCreateOrder()) return;
+
+    const reservation = this.selectedReservation();
+    if (!reservation?.reservationId) {
+      this.snackBar.open('Pick a confirmed reservation with allocated table.', 'Close', {
+        duration: 3500,
+      });
+      return;
     }
-  }
 
-  addItem(): void {
-    this.orderItemsArray.push(this.buildItemRow());
-  }
-
-  removeItem(index: number): void {
-    if (this.orderItemsArray.length > 1) {
-      this.orderItemsArray.removeAt(index);
-    }
-  }
-
-  save(): void {
-    this.form.markAllAsTouched();
-    if (this.form.invalid) return;
-
-    this.submitting.set(true);
-
-    const { reservationId, waiterId, orderItems } = this.form.getRawValue();
+    const waiterId = this.createOrderForm.controls.waiterId.value;
+    this.creatingOrder.set(true);
 
     const payload: RestaurantOrder = {
-      reservation: { reservationId },
+      reservation: { reservationId: reservation.reservationId },
       waiter: { waiterId },
-      totalAmount: this.totalAmount,
-      orderItems: orderItems.map((row) => ({
-        quantity: row.quantity,
-        price: row.price,
-        menuItem: { itemId: row.itemId },
-      })),
     };
 
     this.orderService
       .createOrder(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.submitting.set(false);
-          this.snackBar.open('Order created successfully', 'Close', { duration: 2500 });
-          this.router.navigate(['/orders']);
+        next: (created) => {
+          this.creatingOrder.set(false);
+          this.createdOrder.set(created);
+          this.loadCurrentOrderState();
+          this.snackBar.open('Order created. Add items below.', 'Close', { duration: 2800 });
         },
-        error: () => {
-          this.submitting.set(false);
-          this.snackBar.open('Failed to create order', 'Close', { duration: 3000 });
+        error: (err) => {
+          this.creatingOrder.set(false);
+          const message = err?.error?.message ?? 'Failed to create order.';
+          this.snackBar.open(message, 'Close', { duration: 3500 });
         },
       });
   }
 
-  cancel(): void {
+  addItem(): void {
+    this.addItemForm.markAllAsTouched();
+    const order = this.createdOrder();
+    if (!order?.orderId || this.addItemForm.invalid) return;
+
+    const { itemId, quantity } = this.addItemForm.getRawValue();
+    this.mutatingItem.set(true);
+
+    this.orderItemService
+      .createOrderItem({
+        quantity,
+        restaurantOrder: { orderId: order.orderId },
+        menuItem: { itemId },
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.mutatingItem.set(false);
+          this.addItemForm.reset({ itemId: 0, quantity: 1 });
+          this.loadCurrentOrderState();
+        },
+        error: (err) => {
+          this.mutatingItem.set(false);
+          const message = err?.error?.message ?? 'Failed to add order item.';
+          this.snackBar.open(message, 'Close', { duration: 3500 });
+        },
+      });
+  }
+
+  updateItemQuantity(item: OrderItem, quantity: number): void {
+    const orderId = this.createdOrder()?.orderId;
+    if (!item.orderItemId || !item.menuItem.itemId || !orderId || quantity < 1) return;
+
+    this.mutatingItem.set(true);
+    this.orderItemService
+      .updateOrderItem(item.orderItemId, {
+        quantity,
+        restaurantOrder: { orderId },
+        menuItem: { itemId: item.menuItem.itemId },
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.mutatingItem.set(false);
+          this.loadCurrentOrderState();
+        },
+        error: (err) => {
+          this.mutatingItem.set(false);
+          const message = err?.error?.message ?? 'Failed to update item quantity.';
+          this.snackBar.open(message, 'Close', { duration: 3500 });
+        },
+      });
+  }
+
+  removeItem(item: OrderItem): void {
+    if (!item.orderItemId) return;
+    this.mutatingItem.set(true);
+
+    this.orderItemService
+      .deleteOrderItem(item.orderItemId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.mutatingItem.set(false);
+          this.loadCurrentOrderState();
+        },
+        error: (err) => {
+          this.mutatingItem.set(false);
+          const message = err?.error?.message ?? 'Failed to delete item.';
+          this.snackBar.open(message, 'Close', { duration: 3500 });
+        },
+      });
+  }
+
+  resetForAnotherOrder(): void {
+    this.createdOrder.set(null);
+    this.currentItems.set([]);
+    this.addItemForm.reset({ itemId: 0, quantity: 1 });
+    this.createOrderForm.controls.reservationId.setValue(0);
+  }
+
+  finish(): void {
     this.router.navigate(['/orders']);
   }
+
+  private loadCurrentOrderState(): void {
+    const order = this.createdOrder();
+    if (!order?.orderId) return;
+
+    this.orderService
+      .getOrderById(order.orderId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (freshOrder) => this.createdOrder.set(freshOrder),
+        error: () => {
+          this.snackBar.open('Failed to refresh order total.', 'Close', { duration: 3000 });
+        },
+      });
+
+    this.orderItemService
+      .getAllOrderItems()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          this.currentItems.set(
+            items.filter((item) => item.restaurantOrder?.orderId === order.orderId),
+          );
+        },
+        error: () => {
+          this.snackBar.open('Failed to refresh order items.', 'Close', { duration: 3000 });
+        },
+      });
+  }
 }
+
