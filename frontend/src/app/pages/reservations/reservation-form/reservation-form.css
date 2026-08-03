@@ -8,6 +8,18 @@ mat-card {
   margin-bottom: 8px;
 }
 
+.auto-time-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #c5d6f6;
+  background: #eef5ff;
+  color: #1f2d64;
+}
+
 .assignment-card {
   margin-top: 8px;
   padding: 16px;

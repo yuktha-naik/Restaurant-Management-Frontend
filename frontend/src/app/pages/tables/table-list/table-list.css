@@ -1,3 +1,14 @@
 .full-width { width: 100%; }
 mat-card-header { display: flex; align-items: center; margin-bottom: 16px; }
 mat-card-content { overflow-x: auto; }
+
+.customer-cell__name {
+	font-weight: 600;
+	color: #1f2937;
+}
+
+.customer-cell__meta {
+	margin-top: 2px;
+	color: #6b7280;
+	font-size: 0.78rem;
+}

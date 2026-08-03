@@ -8,8 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MenuItem } from '../../models/menu-item';
+import { Reservation } from '../../models/reservation';
 import { AuthService } from '../../services/auth.service';
 import { MenuItemService } from '../../services/menu-item.service';
+import { ReservationService } from '../../services/reservation.service';
 
 @Component({
   selector: 'app-customer-home',
@@ -30,10 +32,13 @@ export class CustomerHomeComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly authService = inject(AuthService);
   private readonly menuService = inject(MenuItemService);
+  private readonly reservationService = inject(ReservationService);
   private readonly snackBar = inject(MatSnackBar);
 
   readonly loading = signal(true);
+  readonly reservationLoading = signal(true);
   readonly menuItems = signal<MenuItem[]>([]);
+  readonly reservations = signal<Reservation[]>([]);
 
   get welcomeName(): string {
     return this.authService.getName() ?? 'Guest';
@@ -41,6 +46,78 @@ export class CustomerHomeComponent {
 
   constructor() {
     this.loadMenu();
+    this.loadReservations();
+  }
+
+  reservationStatus(reservation: Reservation): string {
+    return reservation.status ?? 'UNKNOWN';
+  }
+
+  formatReservationDate(dateValue: string): string {
+    const parsed = new Date(dateValue);
+    if (Number.isNaN(parsed.getTime())) {
+      return dateValue;
+    }
+
+    return new Intl.DateTimeFormat('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(parsed);
+  }
+
+  tableLabel(reservation: Reservation): string {
+    if (reservation.restaurantTable?.tableNumber != null) {
+      return `Table ${reservation.restaurantTable.tableNumber}`;
+    }
+    if (reservation.restaurantTable?.tableId != null) {
+      return `Table #${reservation.restaurantTable.tableId}`;
+    }
+    return 'Not allocated yet';
+  }
+
+  totalBill(reservation: Reservation): number | null {
+    const unknownReservation = reservation as unknown as Record<string, unknown>;
+    const order = unknownReservation['restaurantOrder'] as Record<string, unknown> | undefined;
+    const payment = unknownReservation['payment'] as Record<string, unknown> | undefined;
+    const orderPayment = order?.['payment'] as Record<string, unknown> | undefined;
+
+    return this.firstNumber(
+      this.toNumber(payment?.['amount']),
+      this.toNumber(orderPayment?.['amount']),
+      this.toNumber(order?.['totalAmount']),
+      this.toNumber(unknownReservation['totalAmount']),
+      this.toNumber(unknownReservation['amount']),
+      this.toNumber(order?.['amount']),
+    );
+  }
+
+  canCancel(reservation: Reservation): boolean {
+    const status = (reservation.status ?? '').toUpperCase();
+    return status !== 'CANCELLED' && status !== 'FINISHED';
+  }
+
+  cancelReservation(reservation: Reservation): void {
+    if (!reservation.reservationId || !this.canCancel(reservation)) {
+      return;
+    }
+
+    if (!confirm('Cancel this reservation?')) {
+      return;
+    }
+
+    this.reservationService
+      .cancelReservation(reservation.reservationId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Reservation cancelled', 'Close', { duration: 3000 });
+          this.loadReservations();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Unable to cancel reservation.';
+          this.snackBar.open(message, 'Close', { duration: 3500 });
+        },
+      });
   }
 
   private loadMenu(): void {
@@ -58,6 +135,56 @@ export class CustomerHomeComponent {
           this.snackBar.open(message, 'Close', { duration: 3500 });
         },
       });
+  }
+
+  private loadReservations(): void {
+    this.reservationLoading.set(true);
+    const userId = this.authService.getUserId();
+
+    this.reservationService
+      .getAllReservations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (reservations) => {
+          const own = userId
+            ? reservations
+                .filter((r) => r.customer?.customerId === userId)
+                .sort(
+                  (a, b) =>
+                    new Date(b.reservationDate).getTime() - new Date(a.reservationDate).getTime(),
+                )
+            : [];
+          this.reservations.set(own);
+          this.reservationLoading.set(false);
+        },
+        error: (err) => {
+          this.reservationLoading.set(false);
+          const message = err?.error?.message ?? 'Unable to load your reservations.';
+          this.snackBar.open(message, 'Close', { duration: 3500 });
+        },
+      });
+  }
+
+  private toNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
+  private firstNumber(...values: Array<number | null>): number | null {
+    for (const value of values) {
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
   }
 }
 

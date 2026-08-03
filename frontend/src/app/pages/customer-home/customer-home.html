@@ -14,6 +14,59 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>
+        <mat-icon>event_note</mat-icon>
+        My Reservations
+      </mat-card-title>
+      <mat-card-subtitle>Track status, table allocation, and billing progress</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (reservationLoading()) {
+        <p>Loading reservations...</p>
+      } @else if (reservations().length === 0) {
+        <p>No reservations yet. Create your first reservation.</p>
+      } @else {
+        <div class="reservation-grid">
+          @for (reservation of reservations(); track reservation.reservationId) {
+            <article class="reservation-item">
+              <div class="reservation-item__header">
+                <h3>Reservation #{{ reservation.reservationId }}</h3>
+                <mat-chip [color]="reservation.status === 'CANCELLED' ? 'warn' : (reservation.status === 'CONFIRMED' ? 'primary' : 'accent')" highlighted>
+                  {{ reservationStatus(reservation) }}
+                </mat-chip>
+              </div>
+
+              <div class="reservation-item__body">
+                <p><strong>Time:</strong> {{ formatReservationDate(reservation.reservationDate) }}</p>
+                <p><strong>Party:</strong> {{ reservation.partySize }}</p>
+                <p><strong>Table:</strong> {{ tableLabel(reservation) }}</p>
+                <p>
+                  <strong>Total Bill:</strong>
+                  @if (totalBill(reservation); as amount) {
+                    {{ amount | currency:'INR':'symbol':'1.0-2' }}
+                  } @else {
+                    Billing pending
+                  }
+                </p>
+              </div>
+
+              <div class="reservation-item__actions">
+                @if (canCancel(reservation)) {
+                  <button mat-stroked-button color="warn" (click)="cancelReservation(reservation)">
+                    Cancel Reservation
+                  </button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
         <mat-icon>menu_book</mat-icon>
         Menu
       </mat-card-title>

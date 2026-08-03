@@ -13,10 +13,6 @@ import { Reservation } from '../../../models/reservation';
 import { AuthService } from '../../../services/auth.service';
 import { ReservationService } from '../../../services/reservation.service';
 
-/** Restaurant operating hours (24h) — mirrors backend `application.properties`. */
-const OPENING_HOUR = 10;
-const CLOSING_HOUR = 22;
-
 @Component({
   selector: 'app-reservation-form',
   standalone: true,
@@ -41,17 +37,11 @@ export class ReservationFormComponent {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
 
-  readonly openingHour = OPENING_HOUR;
-  readonly closingHour = CLOSING_HOUR;
-  readonly minDate = this.todayIso();
-
   readonly submitting = signal(false);
 
   // The person filling this out is the logged-in customer — we use their real
   // id from the stored login session (§3), never spawn a duplicate customer.
   readonly form = this.fb.nonNullable.group({
-    reservationDate: [this.todayIso(), [Validators.required]],
-    reservationTime: ['19:00', [Validators.required]],
     partySize: [1, [Validators.required, Validators.min(1)]],
   });
 
@@ -61,27 +51,13 @@ export class ReservationFormComponent {
 
   /** Human-readable client-side validation message, or null when OK. */
   readonly validationError = computed(() => {
-    const { reservationDate, reservationTime, partySize } = this.formValue();
+    const { partySize } = this.formValue();
     const size = Number(partySize);
 
     if (!size || size < 1) {
       return 'Party size must be at least 1.';
     }
-    if (!reservationDate || !reservationTime) {
-      return null;
-    }
 
-    const when = new Date(`${reservationDate}T${reservationTime}`);
-    if (Number.isNaN(when.getTime())) {
-      return 'Enter a valid date and time.';
-    }
-    if (when.getTime() < Date.now()) {
-      return 'Reservation time cannot be in the past.';
-    }
-    const hour = when.getHours();
-    if (hour < OPENING_HOUR || hour >= CLOSING_HOUR) {
-      return `Reservations are only available between ${OPENING_HOUR}:00 and ${CLOSING_HOUR}:00.`;
-    }
     return null;
   });
 
@@ -106,12 +82,12 @@ export class ReservationFormComponent {
       return;
     }
 
-    const { reservationDate, reservationTime, partySize } = this.form.getRawValue();
+    const { partySize } = this.form.getRawValue();
 
     // §8: only date/time + party size + customer id. The backend auto-assigns
     // the table and status, so we deliberately do NOT send them.
     const reservationPayload: Reservation = {
-      reservationDate: `${reservationDate}T${reservationTime}:00`,
+      reservationDate: this.currentReservationTime(),
       partySize,
       customer: { customerId },
     };
@@ -143,11 +119,15 @@ export class ReservationFormComponent {
       });
   }
 
-  private todayIso(): string {
+  private currentReservationTime(): string {
     const now = new Date();
+    now.setMinutes(now.getMinutes() + 30);
+
     const year = now.getFullYear();
     const month = `${now.getMonth() + 1}`.padStart(2, '0');
     const day = `${now.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const hours = `${now.getHours()}`.padStart(2, '0');
+    const minutes = `${now.getMinutes()}`.padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}:00`;
   }
 }

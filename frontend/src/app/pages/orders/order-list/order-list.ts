@@ -9,7 +9,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { RestaurantOrder } from '../../../models/restaurant-order';
+import { Reservation } from '../../../models/reservation';
 import { RestaurantOrderService } from '../../../services/restaurant-order.service';
+import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
 
 import {
@@ -46,14 +48,16 @@ import {
   styleUrl: './order-list.css',
 })
 export class OrderListComponent implements OnInit {
-  displayedColumns = ['orderId', 'reservation', 'waiter', 'orderTime', 'status', 'total', 'actions'];
+  displayedColumns = ['orderId', 'reservation', 'customer', 'table', 'waiter', 'orderTime', 'status', 'total', 'actions'];
   orders: RestaurantOrder[] = [];
+  reservations: Reservation[] = [];
   loading = false;
 
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
   private orderService: RestaurantOrderService,
+  private reservationService: ReservationService,
   private authService: AuthService,
   public router: Router,
   private snackBar: MatSnackBar,
@@ -88,6 +92,51 @@ ngOnInit(): void {
           this.snackBar.open('Failed to load orders', 'Close', { duration: 3000 });
         },
       });
+
+    this.reservationService
+      .getAllReservations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (reservations) => {
+          this.reservations = reservations;
+        },
+        error: () => {
+          this.snackBar.open('Failed to load reservation details', 'Close', { duration: 3000 });
+        },
+      });
+  }
+
+  customerLabel(order: RestaurantOrder): string {
+    const byOrder = order.reservation?.customer;
+    if (byOrder?.name?.trim()) return byOrder.name;
+    if (byOrder?.customerId != null) return `Customer #${byOrder.customerId}`;
+
+    const reservation = this.findReservation(order.reservation?.reservationId);
+    if (reservation?.customer?.name?.trim()) return reservation.customer.name;
+    if (reservation?.customer?.customerId != null) return `Customer #${reservation.customer.customerId}`;
+
+    return 'Unknown customer';
+  }
+
+  tableLabel(order: RestaurantOrder): string {
+    const byOrder = order.reservation?.restaurantTable;
+    if (byOrder?.tableNumber != null) return `Table ${byOrder.tableNumber}`;
+    if (byOrder?.tableId != null) return `Table #${byOrder.tableId}`;
+
+    const reservation = this.findReservation(order.reservation?.reservationId);
+    if (reservation?.restaurantTable?.tableNumber != null) {
+      return `Table ${reservation.restaurantTable.tableNumber}`;
+    }
+    if (reservation?.restaurantTable?.tableId != null) {
+      return `Table #${reservation.restaurantTable.tableId}`;
+    }
+
+    return 'Not allocated';
+  }
+
+  private findReservation(reservationId: number | undefined): Reservation | undefined {
+    if (!reservationId) return undefined;
+    return this.reservations.find((r) => r.reservationId === reservationId);
   }
 
   updateStatus(order: RestaurantOrder, status: string): void {

@@ -79,7 +79,7 @@ export class PaymentFormComponent {
         next: (payment) =>
           this.form.patchValue({
             amount: payment.amount,
-            paymentMethod: payment.paymentMethod,
+            paymentMethod: payment.paymentMethod ?? '',
             orderId: payment.restaurantOrder.orderId,
           }),
         error: () => {

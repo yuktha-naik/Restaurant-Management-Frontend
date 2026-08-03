@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Reservation, ReservationStatus } from '../../../models/reservation';
 import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
@@ -26,23 +26,37 @@ import { ChangeDetectorRef } from '@angular/core';
   MatCardModule,
   MatChipsModule,
   MatSnackBarModule,
+    CurrencyPipe,
   DatePipe,
 ],
   templateUrl: './reservation-list.html',
   styleUrl: './reservation-list.css',
 })
 export class ReservationListComponent implements OnInit {
+  private readonly reservationStatusColor: Record<ReservationStatus, 'primary' | 'warn' | 'accent'> = {
+    PENDING: 'accent',
+    CONFIRMED: 'primary',
+    CANCELLED: 'warn',
+    FINISHED: 'accent',
+  };
+
   displayedColumns = [
     'reservationId',
     'customer',
     'table',
     'guests',
     'date',
+    'bill',
     'status',
     'actions',
   ];
   reservations: Reservation[] = [];
+  visibleReservations: Reservation[] = [];
   loading = false;
+
+  get isCustomer(): boolean {
+    return this.authService.isCustomer();
+  }
 
   get canManageStatus(): boolean {
     const role = this.authService.getRole();
@@ -61,6 +75,28 @@ export class ReservationListComponent implements OnInit {
     const t = r.restaurantTable;
     if (!t) return 'Auto';
     return t.tableNumber != null ? `Table ${t.tableNumber}` : (t.tableId != null ? `#${t.tableId}` : 'Auto');
+  }
+
+  totalBill(r: Reservation): number | null {
+    const unknownReservation = r as unknown as Record<string, unknown>;
+    const restaurantOrder = unknownReservation['restaurantOrder'] as Record<string, unknown> | undefined;
+    const payment = unknownReservation['payment'] as Record<string, unknown> | undefined;
+    const orderTotal = restaurantOrder?.['totalAmount'];
+    const paymentAmount = (restaurantOrder?.['payment'] as Record<string, unknown> | undefined)?.['amount'];
+
+    return this.toNumber(payment?.['amount'])
+      ?? this.toNumber(paymentAmount)
+      ?? this.toNumber(orderTotal)
+      ?? this.toNumber(unknownReservation['totalAmount']);
+  }
+
+  canCancel(r: Reservation): boolean {
+    const status = (r.status ?? '').toUpperCase();
+    return status !== 'CANCELLED' && status !== 'FINISHED';
+  }
+
+  statusText(r: Reservation): string {
+    return r.status ?? 'UNKNOWN';
   }
 
   private readonly destroyRef = inject(DestroyRef);
@@ -85,6 +121,7 @@ loadReservations(): void {
     .subscribe({
       next: (reservations) => {
         this.reservations = [...reservations];
+        this.visibleReservations = this.filterForCurrentUser(this.reservations);
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -132,8 +169,33 @@ loadReservations(): void {
   }
 
   statusColor(status: string | undefined): 'primary' | 'warn' | 'accent' {
-    if (status === 'CONFIRMED') return 'primary';
-    if (status === 'CANCELLED') return 'warn';
-    return 'accent';
+    const normalized = (status ?? 'PENDING') as ReservationStatus;
+    return this.reservationStatusColor[normalized] ?? 'accent';
+  }
+
+  private filterForCurrentUser(items: Reservation[]): Reservation[] {
+    if (!this.isCustomer) {
+      return items;
+    }
+
+    const currentUserId = this.authService.getUserId();
+    if (!currentUserId) {
+      return [];
+    }
+
+    return items.filter((reservation) => reservation.customer?.customerId === currentUserId);
+  }
+
+  private toNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
   }
 }
