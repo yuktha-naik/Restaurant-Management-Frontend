@@ -51,7 +51,6 @@ export class OrderListComponent implements OnInit {
   loading = false;
 
   private readonly destroyRef = inject(DestroyRef);
-  readonly ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
   constructor(
   private orderService: RestaurantOrderService,
@@ -120,8 +119,13 @@ ngOnInit(): void {
   }
 
   statusColor(status: string): string {
-    if (status === 'DELIVERED') return 'primary';
-    if (status === 'CANCELLED') return 'warn';
+    if (status === 'COMPLETED') return 'primary';
     return 'accent';
+  }
+
+  // Order status is a one-way IN_PROGRESS -> COMPLETED transition; once
+  // completed there's nothing left to change (server also enforces this).
+  nextStatuses(order: RestaurantOrder): string[] {
+    return order.status === 'COMPLETED' ? [] : ['COMPLETED'];
   }
 }

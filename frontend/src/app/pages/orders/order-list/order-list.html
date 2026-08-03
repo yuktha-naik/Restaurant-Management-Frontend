@@ -42,11 +42,11 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let o">
-              @if (isWaiter || isManager) {
+              @if ((isWaiter || isManager) && nextStatuses(o).length > 0) {
                 <button mat-icon-button [matMenuTriggerFor]="statusMenu"
                   title="Change status"><mat-icon>more_vert</mat-icon></button>
                 <mat-menu #statusMenu="matMenu">
-                  @for (s of ORDER_STATUSES; track s) {
+                  @for (s of nextStatuses(o); track s) {
                     <button mat-menu-item (click)="updateStatus(o, s)">{{ s }}</button>
                   }
                 </mat-menu>

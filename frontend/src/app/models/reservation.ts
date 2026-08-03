@@ -1,7 +1,7 @@
 import { Customer } from './customer';
 import { RestaurantTable } from './restaurant-table';
 
-export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
 
 /**
  * On create we only send `{ customerId }` (§6). GET responses may echo more

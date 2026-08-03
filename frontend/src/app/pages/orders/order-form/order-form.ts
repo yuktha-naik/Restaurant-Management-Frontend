@@ -58,6 +58,7 @@ export class OrderFormComponent {
   readonly creatingOrder = signal(false);
   readonly mutatingItem = signal(false);
   readonly reservations = signal<Reservation[]>([]);
+  readonly existingOrders = signal<RestaurantOrder[]>([]);
   readonly waiters = signal<Waiter[]>([]);
   readonly menuItems = signal<MenuItem[]>([]);
   readonly createdOrder = signal<RestaurantOrder | null>(null);
@@ -75,9 +76,18 @@ export class OrderFormComponent {
 
   readonly canCreateOrder = computed(() => !this.createdOrder() && !this.creatingOrder());
   readonly canAddItems = computed(() => !!this.createdOrder() && !this.mutatingItem());
-  readonly confirmedReservations = computed(() =>
-    this.reservations().filter((r) => r.status === 'CONFIRMED' && !!r.restaurantTable),
-  );
+  // Only one order per reservation (per table/customer) at a time — hide any
+  // reservation that already has an order, matching the backend's 409 rule.
+  readonly confirmedReservations = computed(() => {
+    const reservedIds = new Set(this.existingOrders().map((o) => o.reservation?.reservationId));
+    return this.reservations().filter(
+      (r) =>
+        r.status === 'CONFIRMED' &&
+        !!r.restaurantTable &&
+        !!r.reservationId &&
+        !reservedIds.has(r.reservationId),
+    );
+  });
   readonly selectedReservation = computed(() => {
     const selectedId = this.createOrderForm.controls.reservationId.value;
     return this.confirmedReservations().find((r) => r.reservationId === selectedId) ?? null;
@@ -137,6 +147,16 @@ export class OrderFormComponent {
           this.snackBar.open('Failed to load menu items', 'Close', { duration: 3000 });
         },
       });
+
+    this.orderService
+      .getAllOrders()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (orders) => this.existingOrders.set(orders),
+        error: () => {
+          this.snackBar.open('Failed to load existing orders', 'Close', { duration: 3000 });
+        },
+      });
   }
 
   createOrder(): void {
@@ -166,6 +186,7 @@ export class OrderFormComponent {
         next: (created) => {
           this.creatingOrder.set(false);
           this.createdOrder.set(created);
+          this.existingOrders.update((orders) => [...orders, created]);
           this.loadCurrentOrderState();
           this.snackBar.open('Order created. Add items below.', 'Close', { duration: 2800 });
         },

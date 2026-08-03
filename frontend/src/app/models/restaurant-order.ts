@@ -1,6 +1,6 @@
 import { OrderItem } from './order-item';
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus = 'IN_PROGRESS' | 'COMPLETED';
 
 export interface RestaurantOrder {
   orderId?: number;
