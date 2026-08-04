@@ -12,11 +12,34 @@
 
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="save()">
-        <div class="auto-time-banner">
-          <mat-icon>schedule</mat-icon>
-          <div>
-            Reservation date and time will be set automatically when you submit.
-          </div>
+        <div class="datetime-row">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="datePicker" [min]="minDate" formControlName="reservationDate" />
+            <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+            <mat-datepicker #datePicker></mat-datepicker>
+            @if (form.controls.reservationDate.hasError('required') && form.controls.reservationDate.touched) {
+              <mat-error>Date is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Time</mat-label>
+            <input matInput [matTimepicker]="timePicker" formControlName="reservationTime" />
+            <mat-timepicker-toggle matSuffix [for]="timePicker"></mat-timepicker-toggle>
+            <mat-timepicker #timePicker interval="15min"></mat-timepicker>
+            @if (form.controls.reservationTime.hasError('required') && form.controls.reservationTime.touched) {
+              <mat-error>Time is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="preview-chip">
+          <mat-icon>event_available</mat-icon>
+          <span>{{ formattedPreview() }}</span>
+          <button mat-button type="button" class="now-btn" (click)="resetToNow()">
+            <mat-icon>restart_alt</mat-icon> Now
+          </button>
         </div>
 
         <mat-form-field appearance="outline" class="full-width">

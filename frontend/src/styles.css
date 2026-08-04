@@ -1,14 +1,66 @@
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+:root {
+  --rms-primary: #3f51b5;
+  --rms-primary-dark: #2c3a94;
+  --rms-accent: #ff5722;
+  --rms-surface: #ffffff;
+  --rms-bg: #f4f5fb;
+  --rms-text: #1f2233;
+  --rms-text-muted: #6b7086;
+  --rms-radius: 14px;
+  --rms-shadow-sm: 0 2px 8px rgba(31, 34, 51, 0.06);
+  --rms-shadow-md: 0 8px 24px rgba(31, 34, 51, 0.10);
+  --rms-shadow-lg: 0 16px 40px rgba(31, 34, 51, 0.18);
+  --rms-gradient-brand: linear-gradient(135deg, #3f51b5 0%, #6a5ff5 55%, #8e54e9 100%);
+}
+
 /* Global styles */
 html, body {
   height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--rms-bg);
+  color: var(--rms-text);
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, .mat-mdc-card-title, mat-card-title {
+  font-family: "Poppins", Roboto, sans-serif !important;
+  letter-spacing: -0.01em;
+}
+
+/* Slim, unobtrusive scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(63, 81, 181, 0.28);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(63, 81, 181, 0.5);
 }
 
 .page-container {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  animation: rms-fade-in 0.35s ease both;
+}
+
+@keyframes rms-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .spacer {
@@ -18,4 +70,25 @@ html, body {
 .mat-column-actions {
   width: 120px;
   text-align: center;
+}
+
+/* Rounded, slightly elevated cards everywhere by default */
+.mat-mdc-card {
+  border-radius: var(--rms-radius) !important;
+  box-shadow: var(--rms-shadow-sm) !important;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.mat-mdc-raised-button, .mat-mdc-unelevated-button {
+  border-radius: 10px !important;
+  letter-spacing: 0.01em;
+}
+
+.mat-mdc-table {
+  border-radius: var(--rms-radius);
+  overflow: hidden;
+}
+
+.mat-mdc-row:hover {
+  background: rgba(63, 81, 181, 0.04);
 }

@@ -3,16 +3,44 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+  background: linear-gradient(135deg, #3f51b5 0%, #6a5ff5 55%, #8e54e9 100%);
   padding: 24px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-wrapper::before,
+.login-wrapper::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.login-wrapper::before {
+  width: 420px;
+  height: 420px;
+  top: -140px;
+  left: -120px;
+}
+
+.login-wrapper::after {
+  width: 320px;
+  height: 320px;
+  bottom: -120px;
+  right: -100px;
 }
 
 .login-card {
   width: 100%;
   max-width: 420px;
-  padding: 16px;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+  padding: 20px;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
+  position: relative;
+  z-index: 1;
+  animation: rms-fade-in 0.4s ease both;
 }
 
 .portal-switch {
@@ -34,7 +62,8 @@ mat-card-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.3rem !important;
+  font-size: 1.35rem !important;
+  font-family: "Poppins", Roboto, sans-serif !important;
 }
 
 .login-icon {
@@ -52,6 +81,14 @@ mat-card-title {
   margin-top: 8px;
   height: 48px;
   font-size: 1rem;
+  border-radius: 10px !important;
+  background: linear-gradient(120deg, #3f51b5, #7b4fe0) !important;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.login-btn:not([disabled]):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(63, 81, 181, 0.35);
 }
 
 .alt-link {

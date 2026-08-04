@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -12,7 +12,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../services/auth.service';
 import { FormGroup } from '@angular/forms';
-import { UserRole } from '../../models/auth-user';
 
 @Component({
   selector: 'app-login',
@@ -32,16 +31,12 @@ import { UserRole } from '../../models/auth-user';
 })
 export class LoginComponent {
   readonly submitting = signal(false);
-  readonly portalRole = signal<UserRole | null>(null);
-  readonly portalTitle = signal('Staff Login');
-  readonly portalSubtitle = signal('Manager and waiter sign in with email and password');
 
   form!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private route: ActivatedRoute,
     private router: Router,
     private snackBar: MatSnackBar,
   ) {
@@ -49,13 +44,6 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
-
-    const roleFromRoute = this.route.snapshot.data['staffRole'] as UserRole | undefined;
-    if (roleFromRoute) {
-      this.portalRole.set(roleFromRoute);
-      this.portalTitle.set(`${roleFromRoute} Login`);
-      this.portalSubtitle.set(`Sign in as ${roleFromRoute.toLowerCase()} using email and password`);
-    }
   }
 
   onLogin(): void {
@@ -72,17 +60,9 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: () => {
         this.submitting.set(false);
+        // Backend decides the role (MANAGER/WAITER) from the credentials —
+        // the form doesn't ask for or enforce which one it is.
         const loggedInRole = this.authService.getRole();
-        const expectedRole = this.portalRole();
-        if (expectedRole && loggedInRole !== expectedRole) {
-          this.authService.logout();
-          this.snackBar.open(
-            `This page is only for ${expectedRole.toLowerCase()} accounts.`,
-            'Close',
-            { duration: 3500 },
-          );
-          return;
-        }
 
         const destination =
           loggedInRole === 'CUSTOMER'

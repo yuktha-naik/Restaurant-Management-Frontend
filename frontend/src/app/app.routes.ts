@@ -29,18 +29,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/login/login').then((m) => m.LoginComponent),
   },
-  {
-    path: 'staff/manager',
-    loadComponent: () =>
-      import('./pages/login/login').then((m) => m.LoginComponent),
-    data: { staffRole: 'MANAGER' },
-  },
-  {
-    path: 'staff/waiter',
-    loadComponent: () =>
-      import('./pages/login/login').then((m) => m.LoginComponent),
-    data: { staffRole: 'WAITER' },
-  },
+  { path: 'staff/manager', redirectTo: 'staff/login', pathMatch: 'full' },
+  { path: 'staff/waiter', redirectTo: 'staff/login', pathMatch: 'full' },
   {
     path: 'login',
     redirectTo: 'staff/login',

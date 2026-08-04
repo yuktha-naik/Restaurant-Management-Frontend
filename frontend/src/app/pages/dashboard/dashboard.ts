@@ -73,6 +73,8 @@ export class DashboardComponent {
   this.loading.set(true);
   this.backendOffline.set(false);
 
+  const isStaff = this.isManager || this.isWaiter;
+
   forkJoin({
     customers: this.isManager
       ? this.customerService
@@ -80,7 +82,7 @@ export class DashboardComponent {
           .pipe(catchError(() => of([])))
       : of([]),
 
-    waiters: this.isManager
+    waiters: isStaff
       ? this.waiterService
           .getAllWaiters()
           .pipe(catchError(() => of([])))
@@ -94,7 +96,7 @@ export class DashboardComponent {
       .getAllMenuItems()
       .pipe(catchError(() => of([]))),
 
-    reservations: this.isManager
+    reservations: isStaff
       ? this.reservationService
           .getAllReservations()
           .pipe(catchError(() => of([])))
@@ -114,14 +116,21 @@ export class DashboardComponent {
         this.loading.set(false);
         this.backendOffline.set(false);
 
-        this.stats.set([
-          {
+        const cards: StatCard[] = [];
+
+        // `GET /customers` is MANAGER-only server-side — don't show a
+        // misleading "0" card for waiters who aren't allowed to see it.
+        if (this.isManager) {
+          cards.push({
             icon: 'people',
             label: 'Customers',
             count: data.customers.length,
             route: '/customers',
             color: '#3f51b5',
-          },
+          });
+        }
+
+        cards.push(
           {
             icon: 'room_service',
             label: 'Waiters',
@@ -164,7 +173,9 @@ export class DashboardComponent {
             route: '/payments',
             color: '#4caf50',
           },
-        ]);
+        );
+
+        this.stats.set(cards);
       },
       error: () => {
         this.loading.set(false);

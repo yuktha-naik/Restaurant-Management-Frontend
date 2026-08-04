@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
@@ -21,6 +21,13 @@ interface JwtPayload {
 export class AuthService {
   private readonly baseUrl = `${environment.apiUrl}/auth`;
   private readonly customersUrl = `${environment.apiUrl}/customers`;
+
+  // The app has no zone.js, so nothing automatically re-renders components
+  // after an async login/logout resolves. This signal is read at the top of
+  // every getter below purely so templates that call those getters (e.g.
+  // NavbarComponent) register a reactive dependency on it — bumping it on
+  // login/logout schedules change detection for anything that read it.
+  private readonly authTick = signal(0);
 
   constructor(private http: HttpClient) {}
 
@@ -58,13 +65,16 @@ export class AuthService {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(LEGACY_USER_KEY);
+    this.authTick.update((v) => v + 1);
   }
 
   getToken(): string | null {
+    this.authTick();
     return localStorage.getItem(TOKEN_KEY);
   }
 
   getCurrentUser(): AuthUser | null {
+    this.authTick();
     const raw = localStorage.getItem(USER_KEY);
     if (!raw) {
       return null;
@@ -154,5 +164,6 @@ export class AuthService {
       role: response.role,
     };
     localStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.authTick.update((v) => v + 1);
   }
 }

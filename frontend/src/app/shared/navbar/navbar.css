@@ -2,22 +2,29 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(120deg, #3f51b5 0%, #5c4fdb 60%, #7b4fe0 100%) !important;
+  box-shadow: 0 4px 18px rgba(63, 81, 181, 0.25);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.2rem;
-  font-weight: 500;
+  font-family: "Poppins", Roboto, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
   cursor: pointer;
   margin-right: 16px;
+  transition: opacity 0.2s ease;
+}
+
+.brand:hover {
+  opacity: 0.85;
 }
 
 .nav-links {
   display: flex;
-  gap: 4px;
+  gap: 2px;
 }
 
 .nav-links a {
@@ -25,11 +32,20 @@
   align-items: center;
   gap: 4px;
   font-size: 0.85rem;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
 }
 
 .active-link {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .spacer {

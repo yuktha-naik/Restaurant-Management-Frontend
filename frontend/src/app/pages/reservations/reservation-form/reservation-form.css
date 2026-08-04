@@ -8,6 +8,45 @@ mat-card {
   margin-bottom: 8px;
 }
 
+.datetime-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date-field {
+  flex: 1 1 220px;
+}
+
+.time-field {
+  flex: 1 1 160px;
+}
+
+.preview-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -4px 0 16px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(63, 81, 181, 0.1), rgba(123, 79, 224, 0.1));
+  color: #2c3a94;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.preview-chip mat-icon {
+  color: #7b4fe0;
+}
+
+.preview-chip .now-btn {
+  margin-left: auto;
+  font-size: 0.8rem;
+  line-height: 1;
+  min-width: 0;
+  padding: 0 8px;
+}
+
 .auto-time-banner {
   display: flex;
   align-items: center;
