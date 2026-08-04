@@ -3,10 +3,12 @@
     <mat-card-header>
       <mat-card-title>
         <mat-icon>receipt_long</mat-icon>
-        Waiter Order Desk
+        {{ editMode() ? 'Edit Order Items' : 'Waiter Order Desk' }}
       </mat-card-title>
       <mat-card-subtitle>
-        Create order for a CONFIRMED reservation, then add items one by one.
+        {{ editMode()
+          ? 'Add, update or remove items on an existing order. The reservation cannot be changed.'
+          : 'Create order for a CONFIRMED reservation, then add items one by one.' }}
       </mat-card-subtitle>
     </mat-card-header>
 
@@ -15,59 +17,69 @@
         <p>Loading order setup data…</p>
       } @else {
 
-        <section class="step-block">
-          <h3>Step 1 — Start Order</h3>
+        @if (!editMode()) {
+          <section class="step-block">
+            <h3>Step 1 — Start Order</h3>
 
-          <form [formGroup]="createOrderForm">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Confirmed Reservation</mat-label>
-              <mat-select formControlName="reservationId">
-                @for (r of confirmedReservations(); track r.reservationId) {
-                  <mat-option [value]="r.reservationId">
-                    #{{ r.reservationId }} — {{ r.customer?.name ?? r.customer?.customerId }}
-                    · Table {{ r.restaurantTable?.tableNumber ?? r.restaurantTable?.tableId }}
-                    · {{ r.reservationDate | date:'short' }}
-                  </mat-option>
+            <form [formGroup]="createOrderForm">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirmed Reservation</mat-label>
+                <mat-select formControlName="reservationId">
+                  @for (r of confirmedReservations(); track r.reservationId) {
+                    <mat-option [value]="r.reservationId">
+                      #{{ r.reservationId }} — {{ r.customer?.name ?? r.customer?.customerId }}
+                      · Table {{ r.restaurantTable?.tableNumber ?? r.restaurantTable?.tableId }}
+                      · {{ r.reservationDate | date:'short' }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (createOrderForm.controls.reservationId.invalid && createOrderForm.controls.reservationId.touched) {
+                  <mat-error>Pick a confirmed reservation</mat-error>
                 }
-              </mat-select>
-              @if (createOrderForm.controls.reservationId.invalid && createOrderForm.controls.reservationId.touched) {
-                <mat-error>Pick a confirmed reservation</mat-error>
-              }
-            </mat-form-field>
+              </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Waiter</mat-label>
-              <mat-select formControlName="waiterId" [disabled]="isWaiter">
-                @for (w of waiters(); track w.waiterId) {
-                  <mat-option [value]="w.waiterId">{{ w.name }}</mat-option>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Waiter</mat-label>
+                <mat-select formControlName="waiterId" [disabled]="isWaiter">
+                  @for (w of waiters(); track w.waiterId) {
+                    <mat-option [value]="w.waiterId">{{ w.name }}</mat-option>
+                  }
+                </mat-select>
+                @if (createOrderForm.controls.waiterId.invalid && createOrderForm.controls.waiterId.touched) {
+                  <mat-error>Select a waiter</mat-error>
                 }
-              </mat-select>
-              @if (createOrderForm.controls.waiterId.invalid && createOrderForm.controls.waiterId.touched) {
-                <mat-error>Select a waiter</mat-error>
-              }
-            </mat-form-field>
-          </form>
+              </mat-form-field>
+            </form>
 
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="createOrder()"
-            [disabled]="!canCreateOrder()">
-            <mat-icon>play_circle</mat-icon>
-            {{ creatingOrder() ? 'Creating...' : 'Create Order' }}
-          </button>
-        </section>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="createOrder()"
+              [disabled]="!canCreateOrder()">
+              <mat-icon>play_circle</mat-icon>
+              {{ creatingOrder() ? 'Creating...' : 'Create Order' }}
+            </button>
+          </section>
+        }
 
         @if (createdOrder(); as order) {
-          <mat-divider></mat-divider>
+          @if (!editMode()) {
+            <mat-divider></mat-divider>
+          }
 
           <section class="step-block">
-            <h3>Step 2 — Add / Update Order Items</h3>
+            <h3>{{ editMode() ? 'Order Items' : 'Step 2 — Add / Update Order Items' }}</h3>
 
             <div class="order-meta">
               <p><strong>Order #{{ order.orderId }}</strong></p>
+              <p>Reservation #{{ order.reservation?.reservationId }}
+                @if (order.reservation?.customer?.name) { — {{ order.reservation?.customer?.name }} }
+                @if (order.reservation?.restaurantTable?.tableNumber != null) {
+                  · Table {{ order.reservation?.restaurantTable?.tableNumber }}
+                }
+              </p>
               <p>Status: {{ order.status }}</p>
-              <p>Total (server): {{ order.totalAmount ?? 0 | currency }}</p>
+              <p>Total: {{ order.totalAmount ?? 0 | currency }}</p>
             </div>
 
             <form [formGroup]="addItemForm" class="item-add-row">
@@ -132,9 +144,11 @@
             }
 
             <div class="form-actions">
-              <button mat-button type="button" (click)="resetForAnotherOrder()">
-                Start Another Order
-              </button>
+              @if (!editMode()) {
+                <button mat-button type="button" (click)="resetForAnotherOrder()">
+                  Start Another Order
+                </button>
+              }
               <button mat-raised-button color="primary" type="button" (click)="finish()">
                 Done
               </button>

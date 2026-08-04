@@ -1,12 +1,14 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
+import { publicGuard } from './guards/public.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'customer', pathMatch: 'full' },
 
   {
     path: 'customer',
+    canActivate: [publicGuard],
     loadComponent: () =>
       import('./pages/signup/signup').then((m) => m.SignupComponent),
   },
@@ -26,6 +28,7 @@ export const routes: Routes = [
 
   {
     path: 'staff/login',
+    canActivate: [publicGuard],
     loadComponent: () =>
       import('./pages/login/login').then((m) => m.LoginComponent),
   },
@@ -39,6 +42,7 @@ export const routes: Routes = [
 
   {
     path: 'customer/login',
+    canActivate: [publicGuard],
     loadComponent: () =>
       import('./pages/signup/signup').then((m) => m.SignupComponent),
   },
@@ -234,6 +238,15 @@ export const routes: Routes = [
         (m) => m.OrderFormComponent,
       ),
   },
+  {
+    path: 'orders/:id/edit',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['WAITER', 'MANAGER'] },
+    loadComponent: () =>
+      import('./pages/orders/order-form/order-form').then(
+        (m) => m.OrderFormComponent,
+      ),
+  },
 
   // ── Payments ──────────────────────────────────────────────────────────────
   {
@@ -262,6 +275,12 @@ export const routes: Routes = [
       import('./pages/payments/payment-form/payment-form').then(
         (m) => m.PaymentFormComponent,
       ),
+  },
+
+  {
+    path: 'access-denied',
+    loadComponent: () =>
+      import('./pages/access-denied/access-denied').then((m) => m.AccessDeniedComponent),
   },
 
   { path: '**', redirectTo: 'customer' },

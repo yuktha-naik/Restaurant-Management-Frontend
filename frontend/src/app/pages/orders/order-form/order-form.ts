@@ -1,6 +1,6 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -46,6 +46,7 @@ export class OrderFormComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly reservationService = inject(ReservationService);
   private readonly waiterService = inject(WaiterService);
   private readonly menuService = inject(MenuItemService);
@@ -63,6 +64,8 @@ export class OrderFormComponent {
   readonly menuItems = signal<MenuItem[]>([]);
   readonly createdOrder = signal<RestaurantOrder | null>(null);
   readonly currentItems = signal<OrderItem[]>([]);
+  /** True when the route contains an orderId — we are editing, not creating. */
+  readonly editMode = signal(false);
 
   readonly createOrderForm = this.fb.nonNullable.group({
     reservationId: [0 as number, [Validators.required, Validators.min(1)]],
@@ -94,11 +97,46 @@ export class OrderFormComponent {
   });
 
   constructor() {
-    this.loadSeedData();
+    const orderId = Number(this.route.snapshot.paramMap.get('id'));
+    if (orderId) {
+      this.editMode.set(true);
+      this.loadEditMode(orderId);
+    } else {
+      this.loadSeedData();
+    }
   }
 
   get isWaiter(): boolean {
     return this.authService.isWaiter();
+  }
+
+  /** Edit mode: load the existing order + its items directly, skip creation step. */
+  private loadEditMode(orderId: number): void {
+    this.loading.set(true);
+
+    this.menuService
+      .getAllMenuItems()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => this.menuItems.set(items.filter((m) => m.available)),
+        error: () => this.snackBar.open('Failed to load menu items', 'Close', { duration: 10000 }),
+      });
+
+    this.orderService
+      .getOrderById(orderId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (order) => {
+          this.createdOrder.set(order);
+          this.loading.set(false);
+          this.loadCurrentOrderState();
+        },
+        error: () => {
+          this.loading.set(false);
+          this.snackBar.open('Failed to load order', 'Close', { duration: 10000 });
+          this.router.navigate(['/orders']);
+        },
+      });
   }
 
   private loadSeedData(): void {
