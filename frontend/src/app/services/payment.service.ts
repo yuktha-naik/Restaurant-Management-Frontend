@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Payment } from '../models/payment';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
   private readonly baseUrl = `${environment.apiUrl}/payments`;
+  private readonly singularBaseUrl = `${environment.apiUrl}/payment`;
 
   constructor(private http: HttpClient) {}
 
@@ -22,14 +23,15 @@ export class PaymentService {
     return this.http.post<Payment>(this.baseUrl, payment);
   }
 
-  // NEW: Waiter/Manager confirms a PENDING payment, moving it to PAID
-  // (and, server-side, the linked reservation to COMPLETED).
-  confirmPayment(id: number): Observable<Payment> {
-    return this.http.put<Payment>(`${this.baseUrl}/${id}/confirm`, {});
-  }
-
   updatePayment(id: number, payment: Payment): Observable<Payment> {
-    return this.http.put<Payment>(`${this.baseUrl}/${id}`, payment);
+    return this.http.put<Payment>(`${this.baseUrl}/${id}`, payment).pipe(
+      catchError((error) => {
+        if (error?.status === 404) {
+          return this.http.put<Payment>(`${this.singularBaseUrl}/${id}`, payment);
+        }
+        return throwError(() => error);
+      }),
+    );
   }
 
   deletePayment(id: number): Observable<string> {

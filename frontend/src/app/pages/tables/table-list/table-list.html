@@ -30,6 +30,7 @@
             <th>ID</th>
             <th>Table No</th>
             <th>Capacity</th>
+            <th>Customer</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -39,6 +40,12 @@
               <td>{{ t.tableId }}</td>
               <td>{{ t.tableNumber }}</td>
               <td>{{ t.capacity }}</td>
+              <td>
+                <div class="customer-cell__name">{{ customerLabelForTable(t) }}</div>
+                @if (reservationLabelForTable(t)) {
+                  <div class="customer-cell__meta">{{ reservationLabelForTable(t) }}</div>
+                }
+              </td>
               <td>{{ t.status }}</td>
 
               <td>

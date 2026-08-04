@@ -12,22 +12,12 @@
 
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="save()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Date</mat-label>
-          <input matInput type="date" formControlName="reservationDate" [min]="minDate" />
-          @if (form.controls.reservationDate.hasError('required') && form.controls.reservationDate.touched) {
-            <mat-error>Date is required</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Time</mat-label>
-          <input matInput type="time" formControlName="reservationTime" />
-          <mat-hint>Open {{ openingHour }}:00 – {{ closingHour }}:00</mat-hint>
-          @if (form.controls.reservationTime.hasError('required') && form.controls.reservationTime.touched) {
-            <mat-error>Time is required</mat-error>
-          }
-        </mat-form-field>
+        <div class="auto-time-banner">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            Reservation date and time will be set automatically when you submit.
+          </div>
+        </div>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Number of People</mat-label>

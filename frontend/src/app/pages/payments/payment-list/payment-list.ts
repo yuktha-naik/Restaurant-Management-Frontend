@@ -20,7 +20,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Payment } from '../../../models/payment';
+import { Reservation } from '../../../models/reservation';
+import { RestaurantOrder } from '../../../models/restaurant-order';
 import { PaymentService } from '../../../services/payment.service';
+import { ReservationService } from '../../../services/reservation.service';
+import { RestaurantOrderService } from '../../../services/restaurant-order.service';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -43,6 +47,7 @@ export class PaymentListComponent implements OnInit {
   displayedColumns = [
     'paymentId',
     'orderId',
+    'customer',
     'amount',
     'method',
     'status',
@@ -51,12 +56,16 @@ export class PaymentListComponent implements OnInit {
   ];
 
   payments: Payment[] = [];
+  orders: RestaurantOrder[] = [];
+  reservations: Reservation[] = [];
   loading = false;
 
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private paymentService: PaymentService,
+    private orderService: RestaurantOrderService,
+    private reservationService: ReservationService,
     private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar,
@@ -92,6 +101,48 @@ export class PaymentListComponent implements OnInit {
           );
         },
       });
+
+    this.orderService
+      .getAllOrders()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (orders) => {
+          this.orders = orders;
+        },
+        error: () => {
+          this.snackBar.open('Failed to load order details', 'Close', { duration: 3000 });
+        },
+      });
+
+    this.reservationService
+      .getAllReservations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (reservations) => {
+          this.reservations = reservations;
+        },
+        error: () => {
+          this.snackBar.open('Failed to load reservation details', 'Close', { duration: 3000 });
+        },
+      });
+  }
+
+  customerLabel(payment: Payment): string {
+    const nestedCustomer = payment.restaurantOrder?.reservation?.customer;
+    if (nestedCustomer?.name?.trim()) return nestedCustomer.name;
+    if (nestedCustomer?.customerId != null) return `Customer #${nestedCustomer.customerId}`;
+
+    const order = this.orders.find((o) => o.orderId === payment.restaurantOrder?.orderId);
+    const orderCustomer = order?.reservation?.customer;
+    if (orderCustomer?.name?.trim()) return orderCustomer.name;
+    if (orderCustomer?.customerId != null) return `Customer #${orderCustomer.customerId}`;
+
+    const reservationId = order?.reservation?.reservationId;
+    const reservation = this.reservations.find((r) => r.reservationId === reservationId);
+    if (reservation?.customer?.name?.trim()) return reservation.customer.name;
+    if (reservation?.customer?.customerId != null) return `Customer #${reservation.customer.customerId}`;
+
+    return 'Unknown customer';
   }
 
   addPayment(): void {
@@ -102,31 +153,51 @@ export class PaymentListComponent implements OnInit {
     this.router.navigate(['/payments', paymentId, 'edit']);
   }
 
-  confirmPayment(paymentId: number): void {
-    if (
-      !confirm(
-        'Confirm this payment? This will mark the payment as PAID and complete the reservation.'
-      )
-    ) {
+  finalizePayment(payment: Payment, status: 'PAID' | 'FAILED'): void {
+    if (!payment.paymentId) {
       return;
     }
 
+    const action = status === 'PAID' ? 'confirm' : 'mark as failed';
+    if (!confirm(`Do you want to ${action} this payment?`)) {
+      return;
+    }
+
+    const suggestedMethod = payment.paymentMethod?.trim() || '';
+    const paymentMethod = prompt('Enter payment method (required):', suggestedMethod)?.trim() ?? '';
+
+    if (!paymentMethod) {
+      this.snackBar.open('Payment method is required to finalize payment', 'Close', {
+        duration: 3200,
+      });
+      return;
+    }
+
+    const payload: Payment = {
+      paymentId: payment.paymentId,
+      amount: payment.amount,
+      paymentMethod,
+      status,
+      restaurantOrder: { orderId: payment.restaurantOrder.orderId },
+    };
+
     this.paymentService
-      .confirmPayment(paymentId)
+      .updatePayment(payment.paymentId, payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.snackBar.open(
-            'Payment confirmed',
+            `Payment updated to ${status}`,
             'Close',
             { duration: 2500 }
           );
 
           this.loadPayments();
         },
-        error: () => {
+        error: (error) => {
+          const message = error?.error?.message ?? `Failed to update payment as ${status}`;
           this.snackBar.open(
-            'Failed to confirm payment',
+            message,
             'Close',
             { duration: 3000 }
           );
