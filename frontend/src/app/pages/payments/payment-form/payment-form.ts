@@ -67,7 +67,7 @@ export class PaymentFormComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (orders) => (this.orders = orders),
-        error: () => this.snackBar.open('Failed to load orders', 'Close', { duration: 3000 }),
+        error: () => this.snackBar.open('Failed to load orders', 'Close', { duration: 10000 }),
       });
   }
 
@@ -83,7 +83,7 @@ export class PaymentFormComponent {
             orderId: payment.restaurantOrder.orderId,
           }),
         error: () => {
-          this.snackBar.open('Failed to load payment', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load payment', 'Close', { duration: 10000 });
           this.router.navigate(['/payments']);
         },
       });
@@ -107,13 +107,13 @@ export class PaymentFormComponent {
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.snackBar.open(`Payment ${this.isEditMode ? 'updated' : 'recorded'} successfully`, 'Close', {
-          duration: 2500,
+          duration: 10000,
         });
         this.router.navigate(['/payments']);
       },
       error: () =>
         this.snackBar.open(`Failed to ${this.isEditMode ? 'update' : 'record'} payment`, 'Close', {
-          duration: 3000,
+          duration: 10000,
         }),
     });
   }

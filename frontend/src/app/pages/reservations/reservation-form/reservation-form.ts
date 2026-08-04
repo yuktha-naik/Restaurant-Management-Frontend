@@ -121,7 +121,7 @@ export class ReservationFormComponent {
     const customerId = this.authService.getUserId();
     if (!customerId || !this.authService.isCustomer()) {
       this.snackBar.open('You must be signed in as a customer to check in.', 'Close', {
-        duration: 3500,
+        duration: 10000,
       });
       return;
     }
@@ -129,7 +129,7 @@ export class ReservationFormComponent {
     const clientError = this.validationError();
     if (this.form.invalid || clientError) {
       if (clientError) {
-        this.snackBar.open(clientError, 'Close', { duration: 3500 });
+        this.snackBar.open(clientError, 'Close', { duration: 10000 });
       }
       return;
     }
@@ -155,13 +155,13 @@ export class ReservationFormComponent {
           this.snackBar.open(
             'Reservation created. A table will be assigned automatically.',
             'Close',
-            { duration: 4000 },
+            { duration: 10000 },
           );
           this.router.navigate(['/customer/home']);
         },
         error: (err) => {
           this.submitting.set(false);
-          this.snackBar.open(this.describeError(err), 'Close', { duration: 4500 });
+          this.snackBar.open(this.describeError(err), 'Close', { duration: 10000 });
         },
       });
   }

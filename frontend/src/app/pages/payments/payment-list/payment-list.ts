@@ -26,6 +26,8 @@ import { PaymentService } from '../../../services/payment.service';
 import { ReservationService } from '../../../services/reservation.service';
 import { RestaurantOrderService } from '../../../services/restaurant-order.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
+import { PaymentMethodDialogService } from '../../../shared/payment-method-dialog/payment-method-dialog.service';
 
 @Component({
   selector: 'app-payment-list',
@@ -70,6 +72,8 @@ export class PaymentListComponent implements OnInit {
     private router: Router,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
+    private confirmDialog: ConfirmDialogService,
+    private paymentMethodDialog: PaymentMethodDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -97,7 +101,7 @@ export class PaymentListComponent implements OnInit {
           this.snackBar.open(
             'Failed to load payments',
             'Close',
-            { duration: 3000 }
+            { duration: 10000 }
           );
         },
       });
@@ -110,7 +114,7 @@ export class PaymentListComponent implements OnInit {
           this.orders = orders;
         },
         error: () => {
-          this.snackBar.open('Failed to load order details', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load order details', 'Close', { duration: 10000 });
         },
       });
 
@@ -122,7 +126,7 @@ export class PaymentListComponent implements OnInit {
           this.reservations = reservations;
         },
         error: () => {
-          this.snackBar.open('Failed to load reservation details', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load reservation details', 'Close', { duration: 10000 });
         },
       });
   }
@@ -158,78 +162,89 @@ export class PaymentListComponent implements OnInit {
       return;
     }
 
-    const action = status === 'PAID' ? 'confirm' : 'mark as failed';
-    if (!confirm(`Do you want to ${action} this payment?`)) {
-      return;
-    }
+    const title = status === 'PAID' ? 'Confirm Payment' : 'Mark Payment as Failed';
+    const message =
+      status === 'PAID'
+        ? 'Select the mode of payment used by the customer, then confirm.'
+        : 'Select the mode of payment attempted, then confirm to mark this payment as failed.';
 
-    const suggestedMethod = payment.paymentMethod?.trim() || '';
-    const paymentMethod = prompt('Enter payment method (required):', suggestedMethod)?.trim() ?? '';
+    const knownMethods = ['CASH', 'CARD', 'UPI'] as const;
+    const normalizedMethod = payment.paymentMethod?.trim().toUpperCase();
+    const defaultMethod = (knownMethods as readonly string[]).includes(normalizedMethod ?? '')
+      ? (normalizedMethod as 'CASH' | 'CARD' | 'UPI')
+      : 'CASH';
 
-    if (!paymentMethod) {
-      this.snackBar.open('Payment method is required to finalize payment', 'Close', {
-        duration: 3200,
-      });
-      return;
-    }
+    this.paymentMethodDialog
+      .choosePaymentMethod({
+        title,
+        message,
+        danger: status === 'FAILED',
+        confirmText: status === 'PAID' ? 'Confirm Payment' : 'Mark Failed',
+        defaultMethod,
+      })
+      .subscribe((paymentMethod) => {
+        if (!paymentMethod) return;
 
-    const payload: Payment = {
-      paymentId: payment.paymentId,
-      amount: payment.amount,
-      paymentMethod,
-      status,
-      restaurantOrder: { orderId: payment.restaurantOrder.orderId },
-    };
+        const payload: Payment = {
+          paymentId: payment.paymentId,
+          amount: payment.amount,
+          paymentMethod,
+          status,
+          restaurantOrder: { orderId: payment.restaurantOrder.orderId },
+        };
 
-    this.paymentService
-      .updatePayment(payment.paymentId, payload)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            `Payment updated to ${status}`,
-            'Close',
-            { duration: 2500 }
-          );
+        this.paymentService
+          .updatePayment(payment.paymentId!, payload)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open(
+                `Payment updated to ${status}`,
+                'Close',
+                { duration: 10000 }
+              );
 
-          this.loadPayments();
-        },
-        error: (error) => {
-          const message = error?.error?.message ?? `Failed to update payment as ${status}`;
-          this.snackBar.open(
-            message,
-            'Close',
-            { duration: 3000 }
-          );
-        },
+              this.loadPayments();
+            },
+            error: (error) => {
+              const message = error?.error?.message ?? `Failed to update payment as ${status}`;
+              this.snackBar.open(
+                message,
+                'Close',
+                { duration: 10000 }
+              );
+            },
+          });
       });
   }
 
   deletePayment(paymentId: number): void {
-    if (!confirm('Delete this payment?')) {
-      return;
-    }
+    this.confirmDialog
+      .confirm('Delete this payment?', { title: 'Delete Payment', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
 
-    this.paymentService
-      .deletePayment(paymentId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            'Payment deleted',
-            'Close',
-            { duration: 2500 }
-          );
+        this.paymentService
+          .deletePayment(paymentId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open(
+                'Payment deleted',
+                'Close',
+                { duration: 10000 }
+              );
 
-          this.loadPayments();
-        },
-        error: () => {
-          this.snackBar.open(
-            'Failed to delete payment',
-            'Close',
-            { duration: 3000 }
-          );
-        },
+              this.loadPayments();
+            },
+            error: () => {
+              this.snackBar.open(
+                'Failed to delete payment',
+                'Close',
+                { duration: 10000 }
+              );
+            },
+          });
       });
   }
 }

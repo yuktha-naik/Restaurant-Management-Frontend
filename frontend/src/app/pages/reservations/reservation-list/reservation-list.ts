@@ -10,6 +10,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Reservation, ReservationStatus } from '../../../models/reservation';
 import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
@@ -106,6 +107,7 @@ export class ReservationListComponent implements OnInit {
   private authService: AuthService,
   private snackBar: MatSnackBar,
   private cdr: ChangeDetectorRef,
+  private confirmDialog: ConfirmDialogService,
 ) {}
 
 ngOnInit(): void {
@@ -131,7 +133,7 @@ loadReservations(): void {
         this.snackBar.open(
           'Failed to load reservations',
           'Close',
-          { duration: 3000 }
+          { duration: 10000 }
         );
       },
     });
@@ -145,26 +147,34 @@ loadReservations(): void {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.snackBar.open(`Status updated to ${status}`, 'Close', { duration: 2500 });
+          this.snackBar.open(`Status updated to ${status}`, 'Close', { duration: 10000 });
           this.loadReservations();
         },
         error: () =>
-          this.snackBar.open('Failed to update status', 'Close', { duration: 3000 }),
+          this.snackBar.open('Failed to update status', 'Close', { duration: 10000 }),
       });
   }
 
   cancel(reservationId: number | undefined): void {
     if (!reservationId) return;
-    if (!confirm('Cancel this reservation? The table will be freed.')) return;
-    this.reservationService
-      .cancelReservation(reservationId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Reservation cancelled', 'Close', { duration: 2500 });
-          this.loadReservations();
-        },
-        error: () => this.snackBar.open('Failed to cancel', 'Close', { duration: 3000 }),
+    this.confirmDialog
+      .confirm('Cancel this reservation? The table will be freed.', {
+        title: 'Cancel Reservation',
+        danger: true,
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.reservationService
+          .cancelReservation(reservationId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Reservation cancelled', 'Close', { duration: 10000 });
+              this.loadReservations();
+            },
+            error: () => this.snackBar.open('Failed to cancel', 'Close', { duration: 10000 }),
+          });
       });
   }
 

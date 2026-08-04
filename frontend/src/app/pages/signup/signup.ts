@@ -63,7 +63,7 @@ export class SignupComponent {
 
   private finish(message: string): void {
     this.submitting.set(false);
-    this.snackBar.open(message, 'Close', { duration: 3000 });
+    this.snackBar.open(message, 'Close', { duration: 10000 });
     this.router.navigate(['/customer/home']);
   }
 
@@ -72,6 +72,6 @@ export class SignupComponent {
     const serverMsg =
       err?.error?.message ??
       (err?.error?.fieldErrors ? Object.values(err.error.fieldErrors).join(' ') : null);
-    this.snackBar.open(serverMsg ?? fallback, 'Close', { duration: 4000 });
+    this.snackBar.open(serverMsg ?? fallback, 'Close', { duration: 10000 });
   }
 }

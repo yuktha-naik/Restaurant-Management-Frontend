@@ -1,0 +1,30 @@
+<h2 mat-dialog-title class="pm-title">
+  <mat-icon [class.danger-icon]="data.danger">{{ data.danger ? 'error' : 'payments' }}</mat-icon>
+  {{ data.title ?? 'Confirm Payment' }}
+</h2>
+
+<mat-dialog-content class="pm-content">
+  @if (data.message) {
+  <p class="pm-message">{{ data.message }}</p>
+  }
+
+  <mat-form-field appearance="outline" class="pm-field">
+    <mat-label>Mode of Payment</mat-label>
+    <mat-select [(ngModel)]="selectedMethod">
+      @for (method of methods; track method) {
+      <mat-option [value]="method">{{ method }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button
+    mat-raised-button
+    type="button"
+    [color]="data.danger ? 'warn' : 'primary'"
+    (click)="confirm()">
+    {{ data.confirmText ?? 'Confirm' }}
+  </button>
+</mat-dialog-actions>

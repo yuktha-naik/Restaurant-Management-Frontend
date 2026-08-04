@@ -111,7 +111,7 @@ export class OrderFormComponent {
         next: (reservations) => this.reservations.set(reservations),
         error: () => {
           this.loading.set(false);
-          this.snackBar.open('Failed to load reservations', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load reservations', 'Close', { duration: 10000 });
         },
       });
 
@@ -132,7 +132,7 @@ export class OrderFormComponent {
         },
         error: () => {
           this.loading.set(false);
-          this.snackBar.open('Failed to load waiters', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load waiters', 'Close', { duration: 10000 });
         },
       });
 
@@ -144,7 +144,7 @@ export class OrderFormComponent {
           this.menuItems.set(menuItems.filter((m) => m.available));
         },
         error: () => {
-          this.snackBar.open('Failed to load menu items', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load menu items', 'Close', { duration: 10000 });
         },
       });
 
@@ -154,7 +154,7 @@ export class OrderFormComponent {
       .subscribe({
         next: (orders) => this.existingOrders.set(orders),
         error: () => {
-          this.snackBar.open('Failed to load existing orders', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load existing orders', 'Close', { duration: 10000 });
         },
       });
   }
@@ -166,7 +166,7 @@ export class OrderFormComponent {
     const reservation = this.selectedReservation();
     if (!reservation?.reservationId) {
       this.snackBar.open('Pick a confirmed reservation with allocated table.', 'Close', {
-        duration: 3500,
+        duration: 10000,
       });
       return;
     }
@@ -188,12 +188,12 @@ export class OrderFormComponent {
           this.createdOrder.set(created);
           this.existingOrders.update((orders) => [...orders, created]);
           this.loadCurrentOrderState();
-          this.snackBar.open('Order created. Add items below.', 'Close', { duration: 2800 });
+          this.snackBar.open('Order created. Add items below.', 'Close', { duration: 10000 });
         },
         error: (err) => {
           this.creatingOrder.set(false);
           const message = err?.error?.message ?? 'Failed to create order.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
+          this.snackBar.open(message, 'Close', { duration: 10000 });
         },
       });
   }
@@ -222,7 +222,7 @@ export class OrderFormComponent {
         error: (err) => {
           this.mutatingItem.set(false);
           const message = err?.error?.message ?? 'Failed to add order item.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
+          this.snackBar.open(message, 'Close', { duration: 10000 });
         },
       });
   }
@@ -247,7 +247,7 @@ export class OrderFormComponent {
         error: (err) => {
           this.mutatingItem.set(false);
           const message = err?.error?.message ?? 'Failed to update item quantity.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
+          this.snackBar.open(message, 'Close', { duration: 10000 });
         },
       });
   }
@@ -267,7 +267,7 @@ export class OrderFormComponent {
         error: (err) => {
           this.mutatingItem.set(false);
           const message = err?.error?.message ?? 'Failed to delete item.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
+          this.snackBar.open(message, 'Close', { duration: 10000 });
         },
       });
   }
@@ -293,7 +293,7 @@ export class OrderFormComponent {
       .subscribe({
         next: (freshOrder) => this.createdOrder.set(freshOrder),
         error: () => {
-          this.snackBar.open('Failed to refresh order total.', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to refresh order total.', 'Close', { duration: 10000 });
         },
       });
 
@@ -307,7 +307,7 @@ export class OrderFormComponent {
           );
         },
         error: () => {
-          this.snackBar.open('Failed to refresh order items.', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to refresh order items.', 'Close', { duration: 10000 });
         },
       });
   }

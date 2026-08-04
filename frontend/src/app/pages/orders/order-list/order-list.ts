@@ -13,6 +13,7 @@ import { Reservation } from '../../../models/reservation';
 import { RestaurantOrderService } from '../../../services/restaurant-order.service';
 import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 import {
   Component,
@@ -62,6 +63,7 @@ export class OrderListComponent implements OnInit {
   public router: Router,
   private snackBar: MatSnackBar,
   private cdr: ChangeDetectorRef,
+  private confirmDialog: ConfirmDialogService,
 ) {}
 ngOnInit(): void {
   this.loadOrders();
@@ -89,7 +91,7 @@ ngOnInit(): void {
         },
         error: () => {
           this.loading = false;
-          this.snackBar.open('Failed to load orders', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load orders', 'Close', { duration: 10000 });
         },
       });
 
@@ -101,7 +103,7 @@ ngOnInit(): void {
           this.reservations = reservations;
         },
         error: () => {
-          this.snackBar.open('Failed to load reservation details', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load reservation details', 'Close', { duration: 10000 });
         },
       });
   }
@@ -146,24 +148,29 @@ ngOnInit(): void {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.snackBar.open(`Order status updated to ${status}`, 'Close', { duration: 2500 });
+          this.snackBar.open(`Order status updated to ${status}`, 'Close', { duration: 10000 });
           this.loadOrders();
         },
-        error: () => this.snackBar.open('Failed to update order status', 'Close', { duration: 3000 }),
+        error: () => this.snackBar.open('Failed to update order status', 'Close', { duration: 10000 }),
       });
   }
 
   delete(orderId: number): void {
-    if (!confirm('Delete this order?')) return;
-    this.orderService
-      .deleteOrder(orderId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Order deleted', 'Close', { duration: 2500 });
-          this.loadOrders();
-        },
-        error: () => this.snackBar.open('Failed to delete order', 'Close', { duration: 3000 }),
+    this.confirmDialog
+      .confirm('Delete this order?', { title: 'Delete Order', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.orderService
+          .deleteOrder(orderId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Order deleted', 'Close', { duration: 10000 });
+              this.loadOrders();
+            },
+            error: () => this.snackBar.open('Failed to delete order', 'Close', { duration: 10000 }),
+          });
       });
   }
 

@@ -18,6 +18,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Waiter } from '../../../models/waiter';
 import { WaiterService } from '../../../services/waiter.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'app-waiter-list',
@@ -47,6 +48,7 @@ export class WaiterListComponent implements OnInit {
     public router: Router,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
+    private confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -82,7 +84,7 @@ export class WaiterListComponent implements OnInit {
           this.snackBar.open(
             'Failed to load waiters',
             'Close',
-            { duration: 3000 }
+            { duration: 10000 }
           );
         },
       });
@@ -93,30 +95,32 @@ export class WaiterListComponent implements OnInit {
   }
 
   delete(waiterId: number): void {
-    if (!confirm('Delete this waiter?')) {
-      return;
-    }
+    this.confirmDialog
+      .confirm('Delete this waiter?', { title: 'Delete Waiter', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
 
-    this.waiterService
-      .deleteWaiter(waiterId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            'Waiter deleted',
-            'Close',
-            { duration: 2500 }
-          );
+        this.waiterService
+          .deleteWaiter(waiterId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open(
+                'Waiter deleted',
+                'Close',
+                { duration: 10000 }
+              );
 
-          this.loadWaiters();
-        },
-        error: () => {
-          this.snackBar.open(
-            'Failed to delete waiter',
-            'Close',
-            { duration: 3000 }
-          );
-        },
+              this.loadWaiters();
+            },
+            error: () => {
+              this.snackBar.open(
+                'Failed to delete waiter',
+                'Close',
+                { duration: 10000 }
+              );
+            },
+          });
       });
   }
 }

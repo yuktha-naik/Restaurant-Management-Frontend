@@ -79,7 +79,7 @@ export class LoginComponent {
           'Invalid email or password.',
           'Close',
           {
-            duration: 3500,
+            duration: 10000,
           }
         );
       },

@@ -1,0 +1,28 @@
+.pm-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Poppins", Roboto, sans-serif;
+}
+
+.pm-title mat-icon {
+  color: var(--rms-primary, #3f51b5);
+}
+
+.pm-title mat-icon.danger-icon {
+  color: #d32f2f;
+}
+
+.pm-content {
+  min-width: 300px;
+  max-width: 420px;
+}
+
+.pm-message {
+  color: #444;
+  margin: 0 0 12px;
+}
+
+.pm-field {
+  width: 100%;
+}

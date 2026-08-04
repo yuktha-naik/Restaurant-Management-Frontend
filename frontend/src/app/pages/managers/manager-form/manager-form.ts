@@ -68,7 +68,7 @@ export class ManagerFormComponent {
             phone: manager.phone,
           }),
         error: () => {
-          this.snackBar.open('Failed to load manager details', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load manager details', 'Close', { duration: 10000 });
           this.router.navigate(['/managers']);
         },
       });
@@ -90,11 +90,11 @@ export class ManagerFormComponent {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
-            this.snackBar.open('Manager updated successfully', 'Close', { duration: 2500 });
+            this.snackBar.open('Manager updated successfully', 'Close', { duration: 10000 });
             this.router.navigate(['/managers']);
           },
           error: () => {
-            this.snackBar.open('Failed to update manager', 'Close', { duration: 3000 });
+            this.snackBar.open('Failed to update manager', 'Close', { duration: 10000 });
           },
         });
       return;
@@ -105,11 +105,11 @@ export class ManagerFormComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.snackBar.open('Manager created successfully', 'Close', { duration: 2500 });
+          this.snackBar.open('Manager created successfully', 'Close', { duration: 10000 });
           this.router.navigate(['/managers']);
         },
         error: () => {
-          this.snackBar.open('Failed to create manager', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to create manager', 'Close', { duration: 10000 });
         },
       });
   }

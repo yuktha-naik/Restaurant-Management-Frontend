@@ -85,7 +85,7 @@ export class MenuFormComponent {
             managerId: i.manager?.managerId ?? 0,
           }),
         error: () => {
-          this.snackBar.open('Failed to load menu item', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load menu item', 'Close', { duration: 10000 });
           this.router.navigate(['/menu']);
         },
       });
@@ -105,7 +105,7 @@ export class MenuFormComponent {
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.snackBar.open(`Menu item ${this.isEditMode ? 'updated' : 'created'}`, 'Close', {
-          duration: 2500,
+          duration: 10000,
         });
         this.router.navigate(['/menu']);
       },
@@ -113,7 +113,7 @@ export class MenuFormComponent {
         this.snackBar.open(
           `Failed to ${this.isEditMode ? 'update' : 'create'} menu item`,
           'Close',
-          { duration: 3000 },
+          { duration: 10000 },
         ),
     });
   }

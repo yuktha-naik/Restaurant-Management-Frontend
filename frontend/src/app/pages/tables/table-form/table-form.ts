@@ -81,7 +81,7 @@ export class TableFormComponent {
             waiterId: t.waiter?.waiterId ?? null,
           }),
         error: () => {
-          this.snackBar.open('Failed to load table', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load table', 'Close', { duration: 10000 });
           this.router.navigate(['/tables']);
         },
       });
@@ -106,13 +106,13 @@ export class TableFormComponent {
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.snackBar.open(`Table ${this.isEditMode ? 'updated' : 'created'}`, 'Close', {
-          duration: 2500,
+          duration: 10000,
         });
         this.router.navigate(['/tables']);
       },
       error: () =>
         this.snackBar.open(`Failed to ${this.isEditMode ? 'update' : 'create'} table`, 'Close', {
-          duration: 3000,
+          duration: 10000,
         }),
     });
   }

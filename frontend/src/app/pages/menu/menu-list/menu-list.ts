@@ -11,6 +11,7 @@ import { CurrencyPipe, CommonModule } from '@angular/common';
 import { MenuItem } from '../../../models/menu-item';
 import { MenuItemService } from '../../../services/menu-item.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'app-menu-list',
@@ -49,6 +50,7 @@ export class MenuListComponent implements OnInit {
     public router: Router,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
+    private confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +75,7 @@ export class MenuListComponent implements OnInit {
         },
         error: () => {
           this.loading = false;
-          this.snackBar.open('Failed to load menu items', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load menu items', 'Close', { duration: 10000 });
         },
       });
   }
@@ -83,27 +85,31 @@ export class MenuListComponent implements OnInit {
   }
 
   delete(itemId: number): void {
-    if (!confirm('Delete this menu item?')) return;
+    this.confirmDialog
+      .confirm('Delete this menu item?', { title: 'Delete Menu Item', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
 
-    this.menuService
-      .deleteMenuItem(itemId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            'Menu item deleted',
-            'Close',
-            { duration: 2500 }
-          );
+        this.menuService
+          .deleteMenuItem(itemId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open(
+                'Menu item deleted',
+                'Close',
+                { duration: 10000 }
+              );
 
-          this.loadItems();
-        },
-        error: () =>
-          this.snackBar.open(
-            'Failed to delete menu item',
-            'Close',
-            { duration: 3000 }
-          ),
+              this.loadItems();
+            },
+            error: () =>
+              this.snackBar.open(
+                'Failed to delete menu item',
+                'Close',
+                { duration: 10000 }
+              ),
+          });
       });
   }
 }

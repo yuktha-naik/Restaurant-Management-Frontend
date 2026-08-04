@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ConfirmDialogService } from '../../shared/confirm-dialog/confirm-dialog.service';
 import { MenuItem } from '../../models/menu-item';
 import { Reservation } from '../../models/reservation';
 import { AuthService } from '../../services/auth.service';
@@ -34,6 +35,7 @@ export class CustomerHomeComponent {
   private readonly menuService = inject(MenuItemService);
   private readonly reservationService = inject(ReservationService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly loading = signal(true);
   readonly reservationLoading = signal(true);
@@ -101,22 +103,26 @@ export class CustomerHomeComponent {
       return;
     }
 
-    if (!confirm('Cancel this reservation?')) {
-      return;
-    }
+    const reservationId = reservation.reservationId;
 
-    this.reservationService
-      .cancelReservation(reservation.reservationId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Reservation cancelled', 'Close', { duration: 3000 });
-          this.loadReservations();
-        },
-        error: (err) => {
-          const message = err?.error?.message ?? 'Unable to cancel reservation.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
-        },
+    this.confirmDialog
+      .confirm('Cancel this reservation?', { title: 'Cancel Reservation', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.reservationService
+          .cancelReservation(reservationId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Reservation cancelled', 'Close', { duration: 10000 });
+              this.loadReservations();
+            },
+            error: (err) => {
+              const message = err?.error?.message ?? 'Unable to cancel reservation.';
+              this.snackBar.open(message, 'Close', { duration: 10000 });
+            },
+          });
       });
   }
 
@@ -132,7 +138,7 @@ export class CustomerHomeComponent {
         error: (err) => {
           this.loading.set(false);
           const message = err?.error?.message ?? 'Unable to load menu items.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
+          this.snackBar.open(message, 'Close', { duration: 10000 });
         },
       });
   }
@@ -160,7 +166,7 @@ export class CustomerHomeComponent {
         error: (err) => {
           this.reservationLoading.set(false);
           const message = err?.error?.message ?? 'Unable to load your reservations.';
-          this.snackBar.open(message, 'Close', { duration: 3500 });
+          this.snackBar.open(message, 'Close', { duration: 10000 });
         },
       });
   }

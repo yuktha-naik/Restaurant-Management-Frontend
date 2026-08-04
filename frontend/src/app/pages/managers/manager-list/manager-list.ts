@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Manager } from '../../../models/manager';
 import { ManagerService } from '../../../services/manager.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 import { ChangeDetectorRef } from '@angular/core';
 
@@ -41,6 +42,7 @@ export class ManagerListComponent implements OnInit, OnDestroy {
   public router: Router,
   private snackBar: MatSnackBar,
   private cdr: ChangeDetectorRef,
+  private confirmDialog: ConfirmDialogService,
 ) {
   console.log('MANAGER LIST CONSTRUCTOR');
 }
@@ -88,7 +90,7 @@ export class ManagerListComponent implements OnInit, OnDestroy {
             'Failed to load managers',
             'Close',
             {
-              duration: 3000,
+              duration: 10000,
             }
           );
         },
@@ -100,35 +102,37 @@ export class ManagerListComponent implements OnInit, OnDestroy {
   }
 
   delete(managerId: number): void {
-    if (!confirm('Delete this manager?')) {
-      return;
-    }
+    this.confirmDialog
+      .confirm('Delete this manager?', { title: 'Delete Manager', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
 
-    this.managerService
-      .deleteManager(managerId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            'Manager deleted',
-            'Close',
-            {
-              duration: 2500,
-            }
-          );
+        this.managerService
+          .deleteManager(managerId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open(
+                'Manager deleted',
+                'Close',
+                {
+                  duration: 10000,
+                }
+              );
 
-          this.loadManagers();
-        },
+              this.loadManagers();
+            },
 
-        error: () => {
-          this.snackBar.open(
-            'Failed to delete manager',
-            'Close',
-            {
-              duration: 3000,
-            }
-          );
-        },
+            error: () => {
+              this.snackBar.open(
+                'Failed to delete manager',
+                'Close',
+                {
+                  duration: 10000,
+                }
+              );
+            },
+          });
       });
   }
 }

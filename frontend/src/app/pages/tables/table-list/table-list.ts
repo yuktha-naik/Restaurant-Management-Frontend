@@ -12,6 +12,7 @@ import { Reservation } from '../../../models/reservation';
 import { RestaurantTableService } from '../../../services/restaurant-table.service';
 import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 import { forkJoin } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -50,6 +51,7 @@ export class TableListComponent {
   public router: Router,
   private snackBar: MatSnackBar,
   private cdr: ChangeDetectorRef,
+  private confirmDialog: ConfirmDialogService,
 ) {
   this.loadTables();
 }
@@ -80,7 +82,7 @@ export class TableListComponent {
         error: (error) => {
           console.error('TABLE/RESERVATION LOAD ERROR:', error);
           this.loading = false;
-          this.snackBar.open('Failed to load table details', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load table details', 'Close', { duration: 10000 });
         },
       });
   }
@@ -126,38 +128,45 @@ export class TableListComponent {
   }
 
   release(tableId: number): void {
-    if (
-      !confirm(
+    this.confirmDialog
+      .confirm(
         'Mark this table as cleaned and available? This will automatically seat the next best-fit waiting reservation, if any.',
+        { title: 'Release Table' },
       )
-    ) {
-      return;
-    }
-    this.tableService
-      .releaseTable(tableId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Table released and available for reallocation', 'Close', {
-            duration: 3000,
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.tableService
+          .releaseTable(tableId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Table released and available for reallocation', 'Close', {
+                duration: 10000,
+              });
+              this.loadTables();
+            },
+            error: () => this.snackBar.open('Failed to release table', 'Close', { duration: 10000 }),
           });
-          this.loadTables();
-        },
-        error: () => this.snackBar.open('Failed to release table', 'Close', { duration: 3000 }),
       });
   }
 
   delete(tableId: number): void {
-    if (!confirm('Delete this table?')) return;
-    this.tableService
-      .deleteTable(tableId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Table deleted', 'Close', { duration: 2500 });
-          this.loadTables();
-        },
-        error: () => this.snackBar.open('Failed to delete table', 'Close', { duration: 3000 }),
+    this.confirmDialog
+      .confirm('Delete this table?', { title: 'Delete Table', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.tableService
+          .deleteTable(tableId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Table deleted', 'Close', { duration: 10000 });
+              this.loadTables();
+            },
+            error: () => this.snackBar.open('Failed to delete table', 'Close', { duration: 10000 }),
+          });
       });
   }
 

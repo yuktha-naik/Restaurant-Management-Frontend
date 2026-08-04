@@ -84,7 +84,7 @@ export class WaiterFormComponent {
             managerId: w.manager?.managerId ?? 0,
           }),
         error: () => {
-          this.snackBar.open('Failed to load waiter', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load waiter', 'Close', { duration: 10000 });
           this.router.navigate(['/waiters']);
         },
       });
@@ -109,7 +109,7 @@ export class WaiterFormComponent {
         this.snackBar.open(
           `Waiter ${this.isEditMode ? 'updated' : 'created'} successfully`,
           'Close',
-          { duration: 2500 },
+          { duration: 10000 },
         );
         this.router.navigate(['/waiters']);
       },
@@ -117,7 +117,7 @@ export class WaiterFormComponent {
         this.snackBar.open(
           `Failed to ${this.isEditMode ? 'update' : 'create'} waiter`,
           'Close',
-          { duration: 3000 },
+          { duration: 10000 },
         ),
     });
   }

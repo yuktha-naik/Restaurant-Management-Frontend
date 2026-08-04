@@ -66,7 +66,7 @@ export class CustomerFormComponent {
             city: customer.city ?? '',
           }),
         error: () => {
-          this.snackBar.open('Failed to load customer details', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to load customer details', 'Close', { duration: 10000 });
           this.router.navigate(['/customers']);
         },
       });
@@ -90,11 +90,11 @@ export class CustomerFormComponent {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
-            this.snackBar.open('Customer updated successfully', 'Close', { duration: 2500 });
+            this.snackBar.open('Customer updated successfully', 'Close', { duration: 10000 });
             this.router.navigate(['/customers']);
           },
           error: () => {
-            this.snackBar.open('Failed to update customer', 'Close', { duration: 3000 });
+            this.snackBar.open('Failed to update customer', 'Close', { duration: 10000 });
           },
         });
       return;
@@ -105,11 +105,11 @@ export class CustomerFormComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.snackBar.open('Customer created successfully', 'Close', { duration: 2500 });
+          this.snackBar.open('Customer created successfully', 'Close', { duration: 10000 });
           this.router.navigate(['/customers']);
         },
         error: () => {
-          this.snackBar.open('Failed to create customer', 'Close', { duration: 3000 });
+          this.snackBar.open('Failed to create customer', 'Close', { duration: 10000 });
         },
       });
   }

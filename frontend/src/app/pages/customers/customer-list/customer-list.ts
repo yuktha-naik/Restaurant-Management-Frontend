@@ -17,6 +17,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Customer } from '../../../models/customer';
 import { CustomerService } from '../../../services/customer.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'app-customer-list',
@@ -43,6 +44,7 @@ export class CustomerListComponent implements OnInit{
   private router: Router,
   private snackBar: MatSnackBar,
   private cdr: ChangeDetectorRef,
+  private confirmDialog: ConfirmDialogService,
 ) {}
 ngOnInit(): void {
   this.loadCustomers();
@@ -75,30 +77,32 @@ ngOnInit(): void {
   }
 
   deleteCustomer(customerId: number): void {
-    if (!confirm('Delete this customer?')) {
-      return;
-    }
+    this.confirmDialog
+      .confirm('Delete this customer?', { title: 'Delete Customer', danger: true })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
 
-    this.customerService
-      .deleteCustomer(customerId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.snackBar.open(
-            'Customer deleted successfully',
-            'Close',
-            { duration: 2500 }
-          );
+        this.customerService
+          .deleteCustomer(customerId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.snackBar.open(
+                'Customer deleted successfully',
+                'Close',
+                { duration: 10000 }
+              );
 
-          this.loadCustomers();
-        },
-        error: () => {
-          this.snackBar.open(
-            'Failed to delete customer',
-            'Close',
-            { duration: 3000 }
-          );
-        },
+              this.loadCustomers();
+            },
+            error: () => {
+              this.snackBar.open(
+                'Failed to delete customer',
+                'Close',
+                { duration: 10000 }
+              );
+            },
+          });
       });
   }
 }
