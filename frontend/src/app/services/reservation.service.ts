@@ -29,4 +29,10 @@ export class ReservationService {
   cancelReservation(id: number): Observable<string> {
     return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
   }
+
+  getReservationsByCustomerId(customerId: number): Observable<Reservation[]> {
+  return this.http.get<Reservation[]>(
+    `${this.baseUrl}/customer/${customerId}`
+  );
+}
 }

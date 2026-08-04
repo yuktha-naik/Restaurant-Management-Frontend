@@ -116,7 +116,7 @@ export class CustomerHomeComponent {
           .subscribe({
             next: () => {
               this.snackBar.open('Reservation cancelled', 'Close', { duration: 10000 });
-              this.loadReservations();
+              this.loadReservations( );
             },
             error: (err) => {
               const message = err?.error?.message ?? 'Unable to cancel reservation.';
@@ -143,34 +143,71 @@ export class CustomerHomeComponent {
       });
   }
 
-  private loadReservations(): void {
-    this.reservationLoading.set(true);
-    const userId = this.authService.getUserId();
+  // private loadReservations(): void {
+  //   this.reservationLoading.set(true);
+  //   const userId = this.authService.getUserId();
 
-    this.reservationService
-      .getAllReservations()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (reservations) => {
-          const own = userId
-            ? reservations
-                .filter((r) => r.customer?.customerId === userId)
-                .sort(
-                  (a, b) =>
-                    new Date(b.reservationDate).getTime() - new Date(a.reservationDate).getTime(),
-                )
-            : [];
-          this.reservations.set(own);
-          this.reservationLoading.set(false);
-        },
-        error: (err) => {
-          this.reservationLoading.set(false);
-          const message = err?.error?.message ?? 'Unable to load your reservations.';
-          this.snackBar.open(message, 'Close', { duration: 10000 });
-        },
-      });
+  //   this.reservationService
+  //     .getAllReservations()
+  //     .pipe(takeUntilDestroyed(this.destroyRef))
+  //     .subscribe({
+  //       next: (reservations) => {
+  //         const own = userId
+  //           ? reservations
+  //               .filter((r) => r.customer?.customerId === userId)
+  //               .sort(
+  //                 (a, b) =>
+  //                   new Date(b.reservationDate).getTime() - new Date(a.reservationDate).getTime(),
+  //               )
+  //           : [];
+  //         this.reservations.set(own);
+  //         this.reservationLoading.set(false);
+  //       },
+  //       error: (err) => {
+  //         this.reservationLoading.set(false);
+  //         const message = err?.error?.message ?? 'Unable to load your reservations.';
+  //         this.snackBar.open(message, 'Close', { duration: 10000 });
+  //       },
+  //     });
+  // }
+private loadReservations(): void {
+  this.reservationLoading.set(true);
+
+  const userId = this.authService.getUserId();
+
+  if (!userId) {
+    this.reservations.set([]);
+    this.reservationLoading.set(false);
+    return;
   }
 
+  this.reservationService
+    .getReservationsByCustomerId(userId)
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (reservations) => {
+        this.reservations.set(
+          reservations.sort(
+            (a, b) =>
+              new Date(b.reservationDate).getTime() -
+              new Date(a.reservationDate).getTime()
+          )
+        );
+
+        this.reservationLoading.set(false);
+      },
+      error: (err) => {
+        this.reservationLoading.set(false);
+
+        const message =
+          err?.error?.message ?? 'Unable to load your reservations.';
+
+        this.snackBar.open(message, 'Close', {
+          duration: 10000,
+        });
+      },
+    });
+}
   private toNumber(value: unknown): number | null {
     if (typeof value === 'number' && Number.isFinite(value)) {
       return value;
