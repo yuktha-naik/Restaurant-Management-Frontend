@@ -1,16 +1,91 @@
-mat-card {
+.customer-form-card {
   max-width: 700px;
-  margin: 0 auto;
+  margin: 24px auto;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+mat-card-header {
+  margin-bottom: 28px;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.form-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3f51b5, #6a5ff5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-icon mat-icon {
+  font-size: 30px;
+  width: 30px;
+  height: 30px;
+}
+
+mat-card-title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+mat-card-subtitle {
+  margin-top: 4px;
+  color: #6b7086;
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: 18px;
+}
+
+mat-form-field mat-icon {
+  color: #6b7086;
+  margin-right: 8px;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eceff6;
+}
+
+button {
+  min-width: 150px;
+}
+
+button mat-icon {
+  margin-right: 6px;
+}
+
+@media (max-width: 600px) {
+
+  .customer-form-card {
+    margin: 12px;
+  }
+
+  .form-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  button {
+    width: 100%;
+  }
+
 }

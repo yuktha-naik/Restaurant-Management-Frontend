@@ -2,12 +2,165 @@
   width: 100%;
 }
 
+.customer-card {
+  padding: 8px;
+}
+
 mat-card-header {
+  margin-bottom: 24px;
+}
+
+.header-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+mat-card-title {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  gap: 10px;
+}
+
+mat-card-subtitle {
+  margin-top: 4px;
 }
 
 mat-card-content {
   overflow-x: auto;
+}
+
+.stats-card {
+  background: linear-gradient(135deg, #3f51b5, #6a5ff5);
+  color: white;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+
+.stats-label {
+  font-size: 13px;
+  opacity: .9;
+}
+
+.stats-value {
+  margin-top: 6px;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.customer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.customer-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid #e7eaf3;
+  border-radius: 14px;
+  background: #fff;
+  transition: .25s;
+}
+
+.customer-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+.customer-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3f51b5, #6a5ff5);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.customer-details {
+  flex: 1;
+}
+
+.customer-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2233;
+  margin-bottom: 10px;
+}
+
+.customer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: #6b7086;
+  font-size: 14px;
+}
+
+.customer-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.customer-meta mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #3f51b5;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #b8bfd4;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.empty-state p {
+  margin-top: 8px;
+  color: #6b7086;
+}
+
+@media (max-width: 768px) {
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .customer-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .customer-item {
+    align-items: flex-start;
+  }
+
 }

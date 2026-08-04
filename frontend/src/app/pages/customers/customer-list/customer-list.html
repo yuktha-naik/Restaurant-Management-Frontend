@@ -1,40 +1,87 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="customer-card">
 
     <mat-card-header>
-      <mat-card-title>Customers</mat-card-title>
 
-      <span class="spacer"></span>
+      <div class="header-content">
+        <div>
+          <mat-card-title>
+            <mat-icon>groups</mat-icon>
+            Customers
+          </mat-card-title>
+          <mat-card-subtitle>
+            Manage all registered customers
+          </mat-card-subtitle>
+        </div>
 
-      @if (isManager) {
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="addCustomer()">
-          <mat-icon>add</mat-icon>
-          Add Customer
-        </button>
-      }
+        @if (isManager) {
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addCustomer()">
+            <mat-icon>add</mat-icon>
+            Add Customer
+          </button>
+        }
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
 
-      <h3>Total Customers: {{ customers.length }}</h3>
-
-      <div *ngIf="customers.length === 0">
-        No customers found.
+      <div class="stats-card">
+        <div class="stats-label">Total Customers</div>
+        <div class="stats-value">{{ customers.length }}</div>
       </div>
 
-      <div *ngFor="let customer of customers">
-        <p>
-          {{ customer.customerId }} -
-          {{ customer.name }} -
-          {{ customer.email }} -
-          {{ customer.phone }}
-        </p>
+      <div class="empty-state" *ngIf="customers.length === 0">
+        <mat-icon>groups</mat-icon>
+        <h3>No Customers Found</h3>
+        <p>No customer records are available.</p>
+      </div>
+
+      <div class="customer-list" *ngIf="customers.length > 0">
+
+        <div class="customer-item" *ngFor="let customer of customers">
+
+          <div class="customer-avatar">
+            {{ customer.name.charAt(0) }}
+          </div>
+
+          <div class="customer-details">
+
+            <div class="customer-name">
+              {{ customer.name }}
+            </div>
+
+            <div class="customer-meta">
+
+              <span>
+                <mat-icon>badge</mat-icon>
+                {{ customer.customerId }}
+              </span>
+
+              <span>
+                <mat-icon>mail</mat-icon>
+                {{ customer.email }}
+              </span>
+
+              <span>
+                <mat-icon>call</mat-icon>
+                {{ customer.phone }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
 
     </mat-card-content>
 
   </mat-card>
+
 </div>

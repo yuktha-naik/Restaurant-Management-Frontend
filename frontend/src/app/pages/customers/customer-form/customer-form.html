@@ -1,17 +1,38 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="customer-form-card">
+
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
-        {{ isEditMode ? 'Edit Customer' : 'Add Customer' }}
-      </mat-card-title>
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+        </div>
+
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Edit Customer' : 'Add Customer' }}
+          </mat-card-title>
+
+          <mat-card-subtitle>
+            {{ isEditMode ? 'Update customer information' : 'Create a new customer profile' }}
+          </mat-card-subtitle>
+        </div>
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
+
       <form [formGroup]="form" (ngSubmit)="save()">
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
           <input matInput formControlName="name" />
+
           @if (form.controls.name.hasError('required') && form.controls.name.touched) {
             <mat-error>Name is required</mat-error>
           }
@@ -19,7 +40,9 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
+          <mat-icon matPrefix>mail</mat-icon>
           <input matInput formControlName="email" />
+
           @if (form.controls.email.hasError('email') && form.controls.email.touched) {
             <mat-error>Enter a valid email address</mat-error>
           }
@@ -27,24 +50,51 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Phone</mat-label>
+          <mat-icon matPrefix>call</mat-icon>
           <input matInput formControlName="phone" />
+
           @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
             <mat-error>Phone is required</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>City (optional)</mat-label>
+          <mat-label>City (Optional)</mat-label>
+          <mat-icon matPrefix>location_city</mat-icon>
           <input matInput formControlName="city" />
         </mat-form-field>
 
         <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
-          <button mat-raised-button color="primary" type="submit">
-            {{ isEditMode ? 'Update' : 'Create' }}
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="cancel()">
+
+            <mat-icon>close</mat-icon>
+            Cancel
+
           </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit">
+
+            <mat-icon>
+              {{ isEditMode ? 'save' : 'check_circle' }}
+            </mat-icon>
+
+            {{ isEditMode ? 'Update Customer' : 'Create Customer' }}
+
+          </button>
+
         </div>
+
       </form>
+
     </mat-card-content>
+
   </mat-card>
+
 </div>

@@ -349,5 +349,8 @@ export class OrderFormComponent {
         },
       });
   }
+  getMenuItemName(itemId?: number): string {
+  return this.menuItems().find(m => m.itemId === itemId)?.name ?? 'Unknown Item';
+}
 }
 

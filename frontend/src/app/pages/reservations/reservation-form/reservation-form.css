@@ -1,91 +1,137 @@
-mat-card {
-  max-width: 760px;
-  margin: 0 auto;
+.reservation-card{
+    max-width:760px;
+    margin:20px auto;
+    border-radius:22px;
 }
 
-.full-width {
-  width: 100%;
-  margin-bottom: 8px;
+.header-wrapper{
+    display:flex;
+    align-items:center;
+    gap:18px;
 }
 
-.datetime-row {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+.header-icon{
+    width:64px;
+    height:64px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#3f51b5,#6a5ff5);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
 }
 
-.date-field {
-  flex: 1 1 220px;
+.header-icon mat-icon{
+    font-size:32px;
+    width:32px;
+    height:32px;
 }
 
-.time-field {
-  flex: 1 1 160px;
+.full-width{
+    width:100%;
+    margin-bottom:18px;
 }
 
-.preview-chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: -4px 0 16px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: linear-gradient(120deg, rgba(63, 81, 181, 0.1), rgba(123, 79, 224, 0.1));
-  color: #2c3a94;
-  font-weight: 500;
-  font-size: 0.9rem;
+.datetime-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
 }
 
-.preview-chip mat-icon {
-  color: #7b4fe0;
+.preview-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    padding:16px 18px;
+    background:#eef4ff;
+    border:1px solid #d7e4ff;
+    border-radius:16px;
 }
 
-.preview-chip .now-btn {
-  margin-left: auto;
-  font-size: 0.8rem;
-  line-height: 1;
-  min-width: 0;
-  padding: 0 8px;
+.preview-info{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#2c3a94;
+    font-weight:600;
 }
 
-.auto-time-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid #c5d6f6;
-  background: #eef5ff;
-  color: #1f2d64;
+.preview-info mat-icon{
+    color:#3f51b5;
 }
 
-.assignment-card {
-  margin-top: 8px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #eef5ff;
-  border: 1px solid #c5d6f6;
+.assignment-card{
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    padding:18px;
+    border-radius:16px;
+    margin-top:10px;
+    background:#eef8f0;
+    border:1px solid #c8e8d0;
 }
 
-.assignment-card--blocked {
-  background: #fff4eb;
-  border-color: #f2c79b;
+.assignment-card mat-icon{
+    color:#22c55e;
+    margin-top:2px;
 }
 
-.assignment-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.assignment-card h4{
+    margin:0 0 6px;
+    font-size:16px;
 }
 
-.assignment-row--muted {
-  color: #5f6368;
-  margin-top: 8px;
+.assignment-card p{
+    margin:0;
+    color:#64748b;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
+.assignment-card--blocked{
+    background:#fff3f1;
+    border-color:#ffd0ca;
+}
+
+.assignment-card--blocked mat-icon{
+    color:#ef4444;
+}
+
+.form-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:14px;
+    margin-top:28px;
+    padding-top:22px;
+    border-top:1px solid #edf2f7;
+}
+
+button mat-icon{
+    margin-right:6px;
+}
+
+@media(max-width:768px){
+
+.datetime-row{
+    grid-template-columns:1fr;
+}
+
+.preview-card{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:16px;
+}
+
+.form-actions{
+    flex-direction:column-reverse;
+}
+
+.form-actions button{
+    width:100%;
+}
+
+.header-wrapper{
+    flex-direction:column;
+    text-align:center;
+}
+
 }

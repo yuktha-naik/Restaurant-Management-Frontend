@@ -183,4 +183,30 @@ export class DashboardComponent {
       },
     });
 }
+foodFacts: string[] = [
+  "People who eat together are happier together. 🍽️",
+  "Did you know? Honey never spoils—even after thousands of years!",
+  "Good food is the foundation of genuine happiness.",
+  "Every meal is a chance to make a beautiful memory.",
+  "Fresh ingredients make every dish taste better.",
+  "Pizza was once considered food for the poor in Italy.",
+  "Dark chocolate contains antioxidants that are good for your heart.",
+  "The world's most expensive spice is saffron.",
+  "A balanced diet is a cookie in each hand... just kidding! 😄",
+  "Great food starts with fresh ingredients and good company.",
+  "There are over 10,000 varieties of tomatoes worldwide.",
+  "Your next favorite dish might be something you've never tried before.",
+  "Eating slowly helps you enjoy food more and may improve digestion.",
+  "Coffee is one of the most traded commodities in the world.",
+  "Life is uncertain. Eat dessert first. 🍰"
+];
+
+randomFoodFact = '';
+
+ngOnInit(): void {
+
+  this.randomFoodFact =
+    this.foodFacts[Math.floor(Math.random() * this.foodFacts.length)];
+
+}
 }

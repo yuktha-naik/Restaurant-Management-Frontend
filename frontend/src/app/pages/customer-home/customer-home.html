@@ -1,101 +1,268 @@
 <div class="page-container">
+
   <section class="hero">
-    <div>
-      <h1>Welcome, {{ welcomeName }}!</h1>
-      <p>Browse today&apos;s menu and reserve your table in seconds.</p>
+
+    <div class="hero-content">
+
+      <span class="hero-badge">
+        <mat-icon>restaurant</mat-icon>
+        Restaurant Management
+      </span>
+
+      <h1>Welcome back, {{ welcomeName }} 👋</h1>
+
+      <p>
+        Reserve your favorite table, browse today's menu and enjoy a seamless dining experience.
+      </p>
+
+      <button
+        mat-raised-button
+        color="primary"
+        routerLink="/reservations/new">
+
+        <mat-icon>event_seat</mat-icon>
+        Reserve Table
+
+      </button>
+
     </div>
 
-    <button mat-raised-button color="primary" routerLink="/reservations/new">
-      <mat-icon>event_seat</mat-icon>
-      Make Reservation
-    </button>
+    <div class="hero-icon">
+      <mat-icon>restaurant_menu</mat-icon>
+    </div>
+
   </section>
 
+
   <mat-card>
+
     <mat-card-header>
+
       <mat-card-title>
+
         <mat-icon>event_note</mat-icon>
+
         My Reservations
+
       </mat-card-title>
-      <mat-card-subtitle>Track status, table allocation, and billing progress</mat-card-subtitle>
+
+      <mat-card-subtitle>
+
+        Track all your reservations
+
+      </mat-card-subtitle>
+
     </mat-card-header>
 
     <mat-card-content>
+
       @if (reservationLoading()) {
-        <p>Loading reservations...</p>
-      } @else if (reservations().length === 0) {
-        <p>No reservations yet. Create your first reservation.</p>
-      } @else {
-        <div class="reservation-grid">
-          @for (reservation of reservations(); track reservation.reservationId) {
-            <article class="reservation-item">
-              <div class="reservation-item__header">
-                <h3>Reservation #{{ reservation.reservationId }}</h3>
-                <mat-chip [color]="reservation.status === 'CANCELLED' ? 'warn' : (reservation.status === 'CONFIRMED' ? 'primary' : 'accent')" highlighted>
-                  {{ reservationStatus(reservation) }}
-                </mat-chip>
-              </div>
 
-              <div class="reservation-item__body">
-                <p><strong>Time:</strong> {{ formatReservationDate(reservation.reservationDate) }}</p>
-                <p><strong>Party:</strong> {{ reservation.partySize }}</p>
-                <p><strong>Table:</strong> {{ tableLabel(reservation) }}</p>
-                <p>
-                  <strong>Total Bill:</strong>
-                  @if (totalBill(reservation); as amount) {
-                    {{ amount | currency:'INR':'symbol':'1.0-2' }}
-                  } @else {
-                    Billing pending
-                  }
-                </p>
-              </div>
-
-              <div class="reservation-item__actions">
-                @if (canCancel(reservation)) {
-                  <button mat-stroked-button color="warn" (click)="cancelReservation(reservation)">
-                    Cancel Reservation
-                  </button>
-                }
-              </div>
-            </article>
-          }
+        <div class="empty-message">
+          Loading reservations...
         </div>
+
       }
+
+      @else if (reservations().length === 0) {
+
+        <div class="empty-message">
+
+          <mat-icon>event_busy</mat-icon>
+
+          <p>No reservations found.</p>
+
+        </div>
+
+      }
+
+      @else {
+
+        <div class="reservation-grid">
+
+          @for (reservation of reservations(); track reservation.reservationId) {
+
+            <article class="reservation-item">
+
+              <div class="reservation-item__header">
+
+                <div>
+
+                  <h3>Reservation #{{ reservation.reservationId }}</h3>
+
+                  <small>
+
+                    {{ formatReservationDate(reservation.reservationDate) }}
+
+                  </small>
+
+                </div>
+
+                <mat-chip
+                  [color]="reservation.status === 'CANCELLED'
+                  ? 'warn'
+                  : (reservation.status === 'CONFIRMED'
+                  ? 'primary'
+                  : 'accent')"
+                  highlighted>
+
+                  {{ reservationStatus(reservation) }}
+
+                </mat-chip>
+
+              </div>
+
+              <div class="reservation-info">
+
+                <div>
+
+                  <mat-icon>groups</mat-icon>
+
+                  {{ reservation.partySize }} Guests
+
+                </div>
+
+                <div>
+
+                  <mat-icon>table_restaurant</mat-icon>
+
+                  {{ tableLabel(reservation) }}
+
+                </div>
+
+                <div>
+
+                  <mat-icon>payments</mat-icon>
+
+                  @if (totalBill(reservation); as amount) {
+
+                    {{ amount | currency:'INR':'symbol':'1.0-2' }}
+
+                  } @else {
+
+                    Billing Pending
+
+                  }
+
+                </div>
+
+              </div>
+
+              @if (canCancel(reservation)) {
+
+                <button
+                  mat-stroked-button
+                  color="warn"
+                  class="cancel-btn"
+                  (click)="cancelReservation(reservation)">
+
+                  <mat-icon>close</mat-icon>
+
+                  Cancel
+
+                </button>
+
+              }
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
     </mat-card-content>
+
   </mat-card>
+
 
   <mat-card>
+
     <mat-card-header>
+
       <mat-card-title>
-        <mat-icon>menu_book</mat-icon>
-        Menu
+
+        <mat-icon>restaurant_menu</mat-icon>
+
+        Today's Menu
+
       </mat-card-title>
-      <mat-card-subtitle>Available items you can order at the restaurant</mat-card-subtitle>
+
+      <mat-card-subtitle>
+
+        Freshly prepared dishes
+
+      </mat-card-subtitle>
+
     </mat-card-header>
 
     <mat-card-content>
+
       @if (loading()) {
-        <p>Loading menu...</p>
-      } @else if (menuItems().length === 0) {
-        <p>No menu items available right now.</p>
-      } @else {
+
+        <div class="empty-message">
+          Loading menu...
+        </div>
+
+      }
+
+      @else if (menuItems().length === 0) {
+
+        <div class="empty-message">
+
+          <mat-icon>menu_book</mat-icon>
+
+          <p>No menu available.</p>
+
+        </div>
+
+      }
+
+      @else {
+
         <div class="menu-grid">
+
           @for (item of menuItems(); track item.itemId ?? item.name) {
+
             <article class="menu-item">
+
               <div class="menu-item__head">
+
                 <h3>{{ item.name }}</h3>
-                <mat-chip [color]="item.available ? 'primary' : 'warn'" highlighted>
+
+                <mat-chip
+                  [color]="item.available ? 'primary' : 'warn'"
+                  highlighted>
+
                   {{ item.available ? 'Available' : 'Unavailable' }}
+
                 </mat-chip>
+
               </div>
 
-              <p class="menu-item__meta">{{ item.category }}</p>
-              <p class="menu-item__price">{{ item.price | currency: 'INR' : 'symbol' : '1.0-2' }}</p>
-            </article>
-          }
-        </div>
-      }
-    </mat-card-content>
-  </mat-card>
-</div>
+              <p class="menu-item__meta">
 
+                {{ item.category }}
+
+              </p>
+
+              <p class="menu-item__price">
+
+                {{ item.price | currency:'INR':'symbol':'1.0-2' }}
+
+              </p>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </mat-card-content>
+
+  </mat-card>
+
+</div>

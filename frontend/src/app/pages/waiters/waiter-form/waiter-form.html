@@ -1,75 +1,188 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="waiter-form-card">
+
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
-        {{ isEditMode ? 'Edit Waiter' : 'Add Waiter' }}
-      </mat-card-title>
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'room_service' }}</mat-icon>
+        </div>
+
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Edit Waiter' : 'Add Waiter' }}
+          </mat-card-title>
+
+          <mat-card-subtitle>
+            {{ isEditMode
+              ? 'Update waiter information'
+              : 'Create a new waiter account' }}
+          </mat-card-subtitle>
+        </div>
+
+      </div>
+
     </mat-card-header>
+
     <mat-card-content>
+
       <form [formGroup]="form" (ngSubmit)="save()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" />
-          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
-            <mat-error>Name is required</mat-error>
-          }
-        </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Phone</mat-label>
-          <input matInput formControlName="phone" />
-          @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
-            <mat-error>Phone is required</mat-error>
-          }
-        </mat-form-field>
+        <div class="form-section">
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" />
-          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
-            <mat-error>Email is required</mat-error>
-          }
-          @if (form.controls.email.hasError('email') && form.controls.email.touched) {
-            <mat-error>Enter a valid email address</mat-error>
-          }
-        </mat-form-field>
+          <div class="section-title">
+            <mat-icon>badge</mat-icon>
+            Personal Information
+          </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Assigned Manager</mat-label>
-          <mat-select formControlName="managerId">
-            @for (m of managers; track m.managerId) {
-              <mat-option [value]="m.managerId">{{ m.name }}</mat-option>
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Name</mat-label>
+
+            <mat-icon matPrefix>person</mat-icon>
+
+            <input
+              matInput
+              formControlName="name" />
+
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error>Name is required</mat-error>
             }
-          </mat-select>
-          @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
-            <mat-error>Manager is required</mat-error>
-          }
-          @if (form.controls.managerId.hasError('min') && form.controls.managerId.touched) {
-            <mat-error>Please select a manager</mat-error>
-          }
-        </mat-form-field>
+
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Phone</mat-label>
+
+            <mat-icon matPrefix>call</mat-icon>
+
+            <input
+              matInput
+              formControlName="phone" />
+
+            @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+              <mat-error>Phone is required</mat-error>
+            }
+
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Email</mat-label>
+
+            <mat-icon matPrefix>mail</mat-icon>
+
+            <input
+              matInput
+              formControlName="email" />
+
+            @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+              <mat-error>Email is required</mat-error>
+            }
+
+            @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+              <mat-error>Enter a valid email address</mat-error>
+            }
+
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Assigned Manager</mat-label>
+
+            <mat-icon matPrefix>manage_accounts</mat-icon>
+
+            <mat-select formControlName="managerId">
+
+              @for (m of managers; track m.managerId) {
+                <mat-option [value]="m.managerId">
+                  {{ m.name }}
+                </mat-option>
+              }
+
+            </mat-select>
+
+            @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
+              <mat-error>Manager is required</mat-error>
+            }
+
+            @if (form.controls.managerId.hasError('min') && form.controls.managerId.touched) {
+              <mat-error>Please select a manager</mat-error>
+            }
+
+          </mat-form-field>
+
+        </div>
 
         @if (!isEditMode) {
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" />
-            @if (form.controls.password.hasError('required') && form.controls.password.touched) {
-              <mat-error>Password is required</mat-error>
-            }
-            @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
-              <mat-error>Password must be at least 4 characters</mat-error>
-            }
-          </mat-form-field>
+
+          <div class="form-section">
+
+            <div class="section-title">
+              <mat-icon>lock</mat-icon>
+              Login Credentials
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+
+              <mat-label>Password</mat-label>
+
+              <mat-icon matPrefix>lock</mat-icon>
+
+              <input
+                matInput
+                type="password"
+                formControlName="password" />
+
+              @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+                <mat-error>Password is required</mat-error>
+              }
+
+              @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
+                <mat-error>Password must be at least 4 characters</mat-error>
+              }
+
+            </mat-form-field>
+
+          </div>
+
         }
 
         <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
-          <button mat-raised-button color="primary" type="submit">
-            {{ isEditMode ? 'Update' : 'Create' }}
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="cancel()">
+
+            <mat-icon>close</mat-icon>
+
+            Cancel
+
           </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit">
+
+            <mat-icon>
+              {{ isEditMode ? 'save' : 'check_circle' }}
+            </mat-icon>
+
+            {{ isEditMode ? 'Update Waiter' : 'Create Waiter' }}
+
+          </button>
+
         </div>
+
       </form>
+
     </mat-card-content>
+
   </mat-card>
+
 </div>

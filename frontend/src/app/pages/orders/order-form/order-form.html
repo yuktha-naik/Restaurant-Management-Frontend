@@ -1,54 +1,115 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="order-card">
+
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>receipt_long</mat-icon>
-        {{ editMode() ? 'Edit Order Items' : 'Waiter Order Desk' }}
-      </mat-card-title>
-      <mat-card-subtitle>
-        {{ editMode()
-          ? 'Add, update or remove items on an existing order. The reservation cannot be changed.'
-          : 'Create order for a CONFIRMED reservation, then add items one by one.' }}
-      </mat-card-subtitle>
+
+      <div class="header-content">
+
+        <div class="header-icon">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+
+        <div>
+
+          <mat-card-title>
+
+            {{ editMode() ? 'Edit Order Items' : 'Waiter Order Desk' }}
+
+          </mat-card-title>
+
+          <mat-card-subtitle>
+
+            {{ editMode()
+              ? 'Manage items in an existing order.'
+              : 'Create an order and add menu items.' }}
+
+          </mat-card-subtitle>
+
+        </div>
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
+
       @if (loading()) {
-        <p>Loading order setup data…</p>
+
+        <div class="empty-state">
+
+          <mat-icon>hourglass_top</mat-icon>
+
+          <h3>Loading Order Details...</h3>
+
+        </div>
+
       } @else {
 
         @if (!editMode()) {
-          <section class="step-block">
-            <h3>Step 1 — Start Order</h3>
+
+          <div class="section-card">
+
+            <div class="section-title">
+
+              <mat-icon>play_circle</mat-icon>
+
+              Step 1 - Create Order
+
+            </div>
 
             <form [formGroup]="createOrderForm">
+
               <mat-form-field appearance="outline" class="full-width">
+
                 <mat-label>Confirmed Reservation</mat-label>
+
+                <mat-icon matPrefix>event_available</mat-icon>
+
                 <mat-select formControlName="reservationId">
+
                   @for (r of confirmedReservations(); track r.reservationId) {
+
                     <mat-option [value]="r.reservationId">
-                      #{{ r.reservationId }} — {{ r.customer?.name ?? r.customer?.customerId }}
-                      · Table {{ r.restaurantTable?.tableNumber ?? r.restaurantTable?.tableId }}
-                      · {{ r.reservationDate | date:'short' }}
+
+                      #{{ r.reservationId }}
+                      —
+                      {{ r.customer?.name ?? r.customer?.customerId }}
+                      ·
+                      Table {{ r.restaurantTable?.tableNumber ?? r.restaurantTable?.tableId }}
+
                     </mat-option>
+
                   }
+
                 </mat-select>
-                @if (createOrderForm.controls.reservationId.invalid && createOrderForm.controls.reservationId.touched) {
-                  <mat-error>Pick a confirmed reservation</mat-error>
-                }
+
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Waiter</mat-label>
-                <mat-select formControlName="waiterId" [disabled]="isWaiter">
+
+                <mat-label>Assigned Waiter</mat-label>
+
+                <mat-icon matPrefix>room_service</mat-icon>
+
+                <mat-select
+                  formControlName="waiterId"
+                  [disabled]="isWaiter">
+
                   @for (w of waiters(); track w.waiterId) {
-                    <mat-option [value]="w.waiterId">{{ w.name }}</mat-option>
+
+                    <mat-option [value]="w.waiterId">
+
+                      {{ w.name }}
+
+                    </mat-option>
+
                   }
+
                 </mat-select>
-                @if (createOrderForm.controls.waiterId.invalid && createOrderForm.controls.waiterId.touched) {
-                  <mat-error>Select a waiter</mat-error>
-                }
+
               </mat-form-field>
+
             </form>
 
             <button
@@ -56,107 +117,242 @@
               color="primary"
               (click)="createOrder()"
               [disabled]="!canCreateOrder()">
-              <mat-icon>play_circle</mat-icon>
+
+              <mat-icon>add_circle</mat-icon>
+
               {{ creatingOrder() ? 'Creating...' : 'Create Order' }}
+
             </button>
-          </section>
+
+          </div>
+
         }
 
         @if (createdOrder(); as order) {
-          @if (!editMode()) {
-            <mat-divider></mat-divider>
-          }
 
-          <section class="step-block">
-            <h3>{{ editMode() ? 'Order Items' : 'Step 2 — Add / Update Order Items' }}</h3>
+          <div class="section-card">
 
-            <div class="order-meta">
-              <p><strong>Order #{{ order.orderId }}</strong></p>
-              <p>Reservation #{{ order.reservation?.reservationId }}
-                @if (order.reservation?.customer?.name) { — {{ order.reservation?.customer?.name }} }
-                @if (order.reservation?.restaurantTable?.tableNumber != null) {
-                  · Table {{ order.reservation?.restaurantTable?.tableNumber }}
-                }
-              </p>
-              <p>Status: {{ order.status }}</p>
-              <p>Total: {{ order.totalAmount ?? 0 | currency }}</p>
+            <div class="section-title">
+
+              <mat-icon>shopping_cart</mat-icon>
+
+              {{ editMode() ? 'Order Items' : 'Step 2 - Add Order Items' }}
+
             </div>
 
-            <form [formGroup]="addItemForm" class="item-add-row">
+            <div class="order-summary">
+
+              <div class="summary-box">
+
+                <h4>Order</h4>
+
+                <span>#{{ order.orderId }}</span>
+
+              </div>
+
+              <div class="summary-box">
+
+                <h4>Status</h4>
+
+                <span>{{ order.status }}</span>
+
+              </div>
+
+              <div class="summary-box">
+
+                <h4>Total</h4>
+
+                <span>{{ order.totalAmount ?? 0 | currency:'INR':'symbol':'1.0-2' }}</span>
+
+              </div>
+
+            </div>
+
+            <form
+              [formGroup]="addItemForm"
+              class="item-add-row">
+
               <mat-form-field appearance="outline" class="item-field-lg">
+
                 <mat-label>Menu Item</mat-label>
+
+                <mat-icon matPrefix>restaurant_menu</mat-icon>
+
                 <mat-select formControlName="itemId">
+
                   @for (m of menuItems(); track m.itemId) {
+
                     <mat-option [value]="m.itemId">
-                      {{ m.name }} · {{ m.price | currency }}
+
+                      {{ m.name }}
+                      ·
+                      {{ m.price | currency:'INR':'symbol':'1.0-2' }}
+
                     </mat-option>
+
                   }
+
                 </mat-select>
+
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="item-field-sm">
-                <mat-label>Quantity</mat-label>
-                <input matInput type="number" formControlName="quantity" min="1" />
+
+                <mat-label>Qty</mat-label>
+
+                <input
+                  matInput
+                  type="number"
+                  min="1"
+                  formControlName="quantity">
+
               </mat-form-field>
 
-              <button mat-raised-button color="accent" type="button"
-                (click)="addItem()" [disabled]="!canAddItems()">
+              <button
+                mat-raised-button
+                color="accent"
+                type="button"
+                (click)="addItem()"
+                [disabled]="!canAddItems()">
+
                 <mat-icon>add</mat-icon>
+
                 Add
+
               </button>
+
             </form>
 
             @if (currentItems().length === 0) {
-              <p class="empty">No items added yet.</p>
-            } @else {
-              <table class="items-table">
-                <tr>
-                  <th>Item ID</th>
-                  <th>Quantity</th>
-                  <th>Subtotal</th>
-                  <th>Actions</th>
-                </tr>
 
-                @for (item of currentItems(); track item.orderItemId) {
-                  <tr>
-                    <td>{{ item.menuItem.itemId }}</td>
-                    <td>
-                      <input
-                        type="number"
-                        min="1"
-                        [value]="item.quantity"
-                        #qtyInput
-                        class="qty-input" />
-                    </td>
-                    <td>{{ item.subTotal ?? 0 | currency }}</td>
-                    <td>
-                      <button mat-icon-button color="primary"
-                        (click)="updateItemQuantity(item, +qtyInput.value)">
-                        <mat-icon>save</mat-icon>
-                      </button>
-                      <button mat-icon-button color="warn" (click)="removeItem(item)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </td>
-                  </tr>
-                }
-              </table>
+              <div class="empty-state small">
+
+                <mat-icon>restaurant_menu</mat-icon>
+
+                <p>No menu items added.</p>
+
+              </div>
+
+            } @else {
+
+              <div class="table-wrapper">
+
+                <table class="items-table">
+
+                  <thead>
+
+                    <tr>
+                      <th>Item</th>
+                      <th>Qty</th>
+                      <th>Subtotal</th>
+                      <th>Actions</th>
+                    </tr>
+
+                  </thead>
+
+                  <tbody>
+
+                    @for (item of currentItems(); track item.orderItemId) {
+
+                      <tr>
+
+                        <td>#{{ item.menuItem.itemId }}</td>
+
+<td class="item-name">
+
+  {{ getMenuItemName(item.menuItem.itemId) }}
+
+</td>
+
+<td>
+
+  <input
+    type="number"
+    min="1"
+    [value]="item.quantity"
+    #qtyInput
+    class="qty-input">
+
+</td>
+
+<td>
+
+  {{ item.subTotal ?? 0 | currency:'INR':'symbol':'1.0-2' }}
+
+</td>
+
+<td>
+
+  <button
+    mat-icon-button
+    color="primary"
+    (click)="updateItemQuantity(item,+qtyInput.value)">
+
+    <mat-icon>save</mat-icon>
+
+  </button>
+
+  <button
+    mat-icon-button
+    color="warn"
+    (click)="removeItem(item)">
+
+    <mat-icon>delete</mat-icon>
+
+  </button>
+
+</td>
+                      </tr>
+
+                    }
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
             }
 
             <div class="form-actions">
-              @if (!editMode()) {
-                <button mat-button type="button" (click)="resetForAnotherOrder()">
-                  Start Another Order
-                </button>
-              }
-              <button mat-raised-button color="primary" type="button" (click)="finish()">
-                Done
-              </button>
-            </div>
-          </section>
-        }
-      }
-    </mat-card-content>
-  </mat-card>
-</div>
 
+              @if (!editMode()) {
+
+                <button
+                  mat-stroked-button
+                  type="button"
+                  (click)="resetForAnotherOrder()">
+
+                  <mat-icon>restart_alt</mat-icon>
+
+                  New Order
+
+                </button>
+
+              }
+
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="finish()">
+
+                <mat-icon>check_circle</mat-icon>
+
+                Done
+
+              </button>
+
+            </div>
+
+          </div>
+
+        }
+
+      }
+
+    </mat-card-content>
+
+  </mat-card>
+
+</div>

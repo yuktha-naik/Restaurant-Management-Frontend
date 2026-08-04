@@ -1,69 +1,185 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="menu-card">
+
     <mat-card-header>
-      <mat-card-title>Menu Items</mat-card-title>
-      <span class="spacer"></span>
-      @if (isManager) {
-        <button mat-raised-button color="primary" (click)="router.navigate(['/menu/new'])">
-          <mat-icon>add</mat-icon> Add Item
-        </button>
-      }
+
+      <div class="header-content">
+
+        <div>
+          <mat-card-title>
+            <mat-icon>restaurant_menu</mat-icon>
+            Menu Items
+          </mat-card-title>
+
+          <mat-card-subtitle>
+            Manage restaurant menu items
+          </mat-card-subtitle>
+        </div>
+
+        @if (isManager) {
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="router.navigate(['/menu/new'])">
+
+            <mat-icon>add</mat-icon>
+
+            Add Item
+
+          </button>
+        }
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
+
+      <div class="summary-card">
+        <div class="summary-title">Total Menu Items</div>
+        <div class="summary-value">{{ items.length }}</div>
+      </div>
+
       @if (loading) {
-        <p>Loading menu items...</p>
-      } @else if (items.length === 0) {
-        <p>No menu items found.</p>
-      } @else {
-        <table mat-table [dataSource]="items" class="full-width">
-          <ng-container matColumnDef="itemId">
-            <th mat-header-cell *matHeaderCellDef>ID</th>
-            <td mat-cell *matCellDef="let i">{{ i.itemId }}</td>
-          </ng-container>
 
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let i">{{ i.name }}</td>
-          </ng-container>
+        <div class="empty-state">
+          <mat-icon>hourglass_top</mat-icon>
+          <h3>Loading Menu...</h3>
+        </div>
 
-          <ng-container matColumnDef="category">
-            <th mat-header-cell *matHeaderCellDef>Category</th>
-            <td mat-cell *matCellDef="let i">{{ i.category }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="price">
-            <th mat-header-cell *matHeaderCellDef>Price</th>
-            <td mat-cell *matCellDef="let i">{{ i.price | currency }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="available">
-            <th mat-header-cell *matHeaderCellDef>Availability</th>
-            <td mat-cell *matCellDef="let i">
-              <mat-chip [color]="i.available ? 'primary' : 'warn'" highlighted>
-                {{ i.available ? 'Available' : 'Unavailable' }}
-              </mat-chip>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let i">
-              @if (isManager && i.itemId) {
-                <button mat-icon-button color="primary" (click)="edit(i.itemId)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="delete(i.itemId)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              }
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
       }
+
+      @else if (items.length === 0) {
+
+        <div class="empty-state">
+          <mat-icon>menu_book</mat-icon>
+          <h3>No Menu Items Found</h3>
+          <p>Add your first menu item.</p>
+        </div>
+
+      }
+
+      @else {
+
+        <div class="table-container">
+
+          <table
+            mat-table
+            [dataSource]="items"
+            class="full-width">
+
+            <ng-container matColumnDef="itemId">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let i">
+                #{{ i.itemId }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let i">
+
+                <div class="item-name">
+
+                  <div class="item-avatar">
+                    {{ i.name.charAt(0) }}
+                  </div>
+
+                  {{ i.name }}
+
+                </div>
+
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+              <th mat-header-cell *matHeaderCellDef>Category</th>
+              <td mat-cell *matCellDef="let i">
+
+                <span class="category-chip">
+
+                  {{ i.category }}
+
+                </span>
+
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Price</th>
+              <td mat-cell *matCellDef="let i">
+
+                <strong>
+
+                  {{ i.price | currency:'INR':'symbol':'1.0-2' }}
+
+                </strong>
+
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="available">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+
+              <td mat-cell *matCellDef="let i">
+
+                <mat-chip
+                  [color]="i.available ? 'primary' : 'warn'"
+                  highlighted>
+
+                  {{ i.available ? 'Available' : 'Unavailable' }}
+
+                </mat-chip>
+
+              </td>
+
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+
+              <td mat-cell *matCellDef="let i">
+
+                @if (isManager && i.itemId) {
+
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="edit(i.itemId)">
+
+                    <mat-icon>edit</mat-icon>
+
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="delete(i.itemId)">
+
+                    <mat-icon>delete</mat-icon>
+
+                  </button>
+
+                }
+
+              </td>
+
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+          </table>
+
+        </div>
+
+      }
+
     </mat-card-content>
+
   </mat-card>
+
 </div>

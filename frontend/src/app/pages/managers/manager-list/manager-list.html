@@ -1,43 +1,120 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="manager-card">
+
     <mat-card-header>
-      <mat-card-title>Managers</mat-card-title>
-      <span class="spacer"></span>
 
-      @if (isManager) {
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="router.navigate(['/managers/new'])">
+      <div class="header-content">
 
-          <mat-icon>add</mat-icon>
-          Add Manager
+        <div>
+          <mat-card-title>
+            <mat-icon>manage_accounts</mat-icon>
+            Managers
+          </mat-card-title>
 
-        </button>
-      }
+          <mat-card-subtitle>
+            Manage restaurant managers
+          </mat-card-subtitle>
+        </div>
+
+        @if (isManager) {
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="router.navigate(['/managers/new'])">
+
+            <mat-icon>add</mat-icon>
+            Add Manager
+
+          </button>
+        }
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
 
-  <table border="1" style="width:100%">
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-    </tr>
+      <div class="summary-card">
+        <div class="summary-label">Total Managers</div>
+        <div class="summary-value">{{ managers.length }}</div>
+      </div>
 
-    @for (m of managers; track m.managerId) {
-      <tr>
-        <td>{{ m.managerId }}</td>
-        <td>{{ m.name }}</td>
-        <td>{{ m.email }}</td>
-        <td>{{ m.phone }}</td>
-      </tr>
-    }
+      @if (managers.length === 0) {
 
-  </table>
+        <div class="empty-state">
 
-</mat-card-content>
+          <mat-icon>groups</mat-icon>
+
+          <h3>No Managers Found</h3>
+
+          <p>Add your first manager.</p>
+
+        </div>
+
+      } @else {
+
+        <div class="table-wrapper">
+
+          <table class="manager-table">
+
+            <thead>
+
+              <tr>
+                <th>ID</th>
+                <th>Manager</th>
+                <th>Email</th>
+                <th>Phone</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (m of managers; track m.managerId) {
+
+                <tr>
+
+                  <td>#{{ m.managerId }}</td>
+
+                  <td>
+
+                    <div class="manager-info">
+
+                      <div class="avatar">
+
+                        {{ m.name.charAt(0) }}
+
+                      </div>
+
+                      <span>
+
+                        {{ m.name }}
+
+                      </span>
+
+                    </div>
+
+                  </td>
+
+                  <td>{{ m.email }}</td>
+
+                  <td>{{ m.phone }}</td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+    </mat-card-content>
+
   </mat-card>
+
 </div>

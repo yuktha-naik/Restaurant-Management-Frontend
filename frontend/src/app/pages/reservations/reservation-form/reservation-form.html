@@ -1,81 +1,205 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="reservation-card">
+
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>event_seat</mat-icon>
-        Check-In
-      </mat-card-title>
-      <mat-card-subtitle>
-        We'll assign the best available table for your party automatically.
-      </mat-card-subtitle>
+
+      <div class="header-wrapper">
+
+        <div class="header-icon">
+          <mat-icon>event_seat</mat-icon>
+        </div>
+
+        <div>
+          <mat-card-title>Reserve Your Table</mat-card-title>
+          <mat-card-subtitle>
+            Choose your preferred date and time. We'll automatically assign the best available table.
+          </mat-card-subtitle>
+        </div>
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
+
       <form [formGroup]="form" (ngSubmit)="save()">
+
         <div class="datetime-row">
+
           <mat-form-field appearance="outline" class="date-field">
+
             <mat-label>Date</mat-label>
-            <input matInput [matDatepicker]="datePicker" [min]="minDate" formControlName="reservationDate" />
-            <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+
+            <mat-icon matPrefix>calendar_today</mat-icon>
+
+            <input
+              matInput
+              [matDatepicker]="datePicker"
+              [min]="minDate"
+              formControlName="reservationDate">
+
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="datePicker">
+            </mat-datepicker-toggle>
+
             <mat-datepicker #datePicker></mat-datepicker>
+
             @if (form.controls.reservationDate.hasError('required') && form.controls.reservationDate.touched) {
               <mat-error>Date is required</mat-error>
             }
+
           </mat-form-field>
 
+
           <mat-form-field appearance="outline" class="time-field">
+
             <mat-label>Time</mat-label>
-            <input matInput [matTimepicker]="timePicker" formControlName="reservationTime" />
-            <mat-timepicker-toggle matSuffix [for]="timePicker"></mat-timepicker-toggle>
-            <mat-timepicker #timePicker interval="15min"></mat-timepicker>
+
+            <mat-icon matPrefix>schedule</mat-icon>
+
+            <input
+              matInput
+              [matTimepicker]="timePicker"
+              formControlName="reservationTime">
+
+            <mat-timepicker-toggle
+              matSuffix
+              [for]="timePicker">
+            </mat-timepicker-toggle>
+
+            <mat-timepicker
+              #timePicker
+              interval="15min">
+            </mat-timepicker>
+
             @if (form.controls.reservationTime.hasError('required') && form.controls.reservationTime.touched) {
               <mat-error>Time is required</mat-error>
             }
+
           </mat-form-field>
+
         </div>
 
-        <div class="preview-chip">
-          <mat-icon>event_available</mat-icon>
-          <span>{{ formattedPreview() }}</span>
-          <button mat-button type="button" class="now-btn" (click)="resetToNow()">
-            <mat-icon>restart_alt</mat-icon> Now
+
+        <div class="preview-card">
+
+          <div class="preview-info">
+
+            <mat-icon>event_available</mat-icon>
+
+            <span>{{ formattedPreview() }}</span>
+
+          </div>
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="resetToNow()">
+
+            <mat-icon>restart_alt</mat-icon>
+
+            Now
+
           </button>
+
         </div>
+
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Number of People</mat-label>
-          <input matInput type="number" formControlName="partySize" min="1" />
+
+          <mat-label>Number of Guests</mat-label>
+
+          <mat-icon matPrefix>groups</mat-icon>
+
+          <input
+            matInput
+            type="number"
+            min="1"
+            formControlName="partySize">
+
           @if (form.controls.partySize.hasError('required') && form.controls.partySize.touched) {
             <mat-error>Number of people is required</mat-error>
           }
+
           @if (form.controls.partySize.hasError('min') && form.controls.partySize.touched) {
-            <mat-error>Number of people must be at least 1</mat-error>
+            <mat-error>Minimum 1 guest required</mat-error>
           }
+
         </mat-form-field>
 
+
         @if (validationError(); as err) {
+
           <div class="assignment-card assignment-card--blocked">
-            <div class="assignment-row">
-              <mat-icon>warning</mat-icon>
-              <div>{{ err }}</div>
+
+            <mat-icon>warning</mat-icon>
+
+            <div>
+
+              <h4>Unable to Reserve</h4>
+
+              <p>{{ err }}</p>
+
             </div>
+
           </div>
-        } @else {
-          <div class="assignment-card">
-            <div class="assignment-row assignment-row--muted">
-              <mat-icon>info</mat-icon>
-              <div>A suitable table will be assigned automatically by the restaurant.</div>
-            </div>
-          </div>
+
         }
 
+        @else {
+
+          <div class="assignment-card">
+
+            <mat-icon>check_circle</mat-icon>
+
+            <div>
+
+              <h4>Automatic Table Allocation</h4>
+
+              <p>
+                A suitable table will be assigned automatically based on your party size.
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
         <div class="form-actions">
-          <button mat-button type="button" routerLink="/customer/home">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
-            {{ submitting() ? 'Saving...' : 'Create Reservation' }}
+
+          <button
+            mat-stroked-button
+            type="button"
+            routerLink="/customer/home">
+
+            <mat-icon>arrow_back</mat-icon>
+
+            Cancel
+
           </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="submitting()">
+
+            <mat-icon>check_circle</mat-icon>
+
+            {{ submitting() ? 'Creating...' : 'Create Reservation' }}
+
+          </button>
+
         </div>
+
       </form>
+
     </mat-card-content>
+
   </mat-card>
+
 </div>

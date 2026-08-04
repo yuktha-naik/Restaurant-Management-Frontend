@@ -1,91 +1,214 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="table-card">
 
     <mat-card-header>
-      <mat-card-title>Restaurant Tables</mat-card-title>
 
-      <span class="spacer"></span>
+      <div class="header-content">
 
-      @if (isManager) {
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="router.navigate(['/tables/new'])">
+        <div>
+          <mat-card-title>
+            <mat-icon>table_restaurant</mat-icon>
+            Restaurant Tables
+          </mat-card-title>
 
-          <mat-icon>add</mat-icon>
-          Add Table
+          <mat-card-subtitle>
+            View and manage restaurant seating
+          </mat-card-subtitle>
+        </div>
 
-        </button>
-      }
+        @if (isManager) {
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="router.navigate(['/tables/new'])">
+
+            <mat-icon>add</mat-icon>
+            Add Table
+
+          </button>
+        }
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
 
+      <div class="summary-card">
+        <div class="summary-title">Total Tables</div>
+        <div class="summary-value">{{ tables.length }}</div>
+      </div>
+
       @if (loading) {
-        <p>Loading...</p>
+
+        <div class="empty-state">
+          <mat-icon>hourglass_top</mat-icon>
+          <h3>Loading Tables...</h3>
+        </div>
+
+      } @else if (tables.length === 0) {
+
+        <div class="empty-state">
+          <mat-icon>table_restaurant</mat-icon>
+          <h3>No Tables Found</h3>
+          <p>Add your first restaurant table.</p>
+        </div>
+
       } @else {
 
-        <table border="1" style="width:100%">
-          <tr>
-            <th>ID</th>
-            <th>Table No</th>
-            <th>Capacity</th>
-            <th>Customer</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
+        <div class="table-wrapper">
 
-          @for (t of tables; track t.tableId) {
-            <tr>
-              <td>{{ t.tableId }}</td>
-              <td>{{ t.tableNumber }}</td>
-              <td>{{ t.capacity }}</td>
-              <td>
-                <div class="customer-cell__name">{{ customerLabelForTable(t) }}</div>
-                @if (reservationLabelForTable(t)) {
-                  <div class="customer-cell__meta">{{ reservationLabelForTable(t) }}</div>
-                }
-              </td>
-              <td>{{ t.status }}</td>
+          <table class="restaurant-table">
 
-              <td>
+            <thead>
 
-                @if (isManager && t.tableId) {
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    (click)="edit(t.tableId)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                }
+              <tr>
+                <th>ID</th>
+                <th>Table</th>
+                <th>Capacity</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
 
-                @if ((isManager || isWaiter) && t.tableId && t.status !== 'AVAILABLE') {
-                  <button
-                    mat-icon-button
-                    color="accent"
-                    title="Release table"
-                    (click)="release(t.tableId)">
-                    <mat-icon>cleaning_services</mat-icon>
-                  </button>
-                }
+            </thead>
 
-                @if (isManager && t.tableId) {
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    (click)="delete(t.tableId)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                }
+            <tbody>
 
-              </td>
-            </tr>
-          }
-        </table>
+              @for (t of tables; track t.tableId) {
+
+                <tr>
+
+                  <td>#{{ t.tableId }}</td>
+
+                  <td>
+
+                    <div class="table-info">
+
+                      <div class="table-avatar">
+
+                        {{ t.tableNumber }}
+
+                      </div>
+
+                      <span>
+
+                        Table {{ t.tableNumber }}
+
+                      </span>
+
+                    </div>
+
+                  </td>
+
+                  <td>
+
+                    <span class="capacity-chip">
+
+                      {{ t.capacity }} Seats
+
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    <div class="customer-cell__name">
+
+                      {{ customerLabelForTable(t) }}
+
+                    </div>
+
+                    @if (reservationLabelForTable(t)) {
+
+                      <div class="customer-cell__meta">
+
+                        {{ reservationLabelForTable(t) }}
+
+                      </div>
+
+                    }
+
+                  </td>
+
+                  <td>
+
+                    <span
+                      class="status-chip"
+                      [ngClass]="{
+                        'available': t.status === 'AVAILABLE',
+                        'occupied': t.status === 'OCCUPIED',
+                        'reserved': t.status === 'RESERVED'
+                      }">
+
+                      {{ t.status }}
+
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    <div class="action-buttons">
+
+                      @if (isManager && t.tableId) {
+
+                        <button
+                          mat-icon-button
+                          color="primary"
+                          (click)="edit(t.tableId)">
+
+                          <mat-icon>edit</mat-icon>
+
+                        </button>
+
+                      }
+
+                      @if ((isManager || isWaiter) && t.tableId && t.status !== 'AVAILABLE') {
+
+                        <button
+                          mat-icon-button
+                          color="accent"
+                          (click)="release(t.tableId)">
+
+                          <mat-icon>cleaning_services</mat-icon>
+
+                        </button>
+
+                      }
+
+                      @if (isManager && t.tableId) {
+
+                        <button
+                          mat-icon-button
+                          color="warn"
+                          (click)="delete(t.tableId)">
+
+                          <mat-icon>delete</mat-icon>
+
+                        </button>
+
+                      }
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       }
 
     </mat-card-content>
 
   </mat-card>
+
 </div>

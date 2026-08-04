@@ -1,3 +1,109 @@
-mat-card { max-width: 700px; margin: 0 auto; }
-.full-width { width: 100%; margin-bottom: 8px; }
-.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+.manager-form-card{
+    max-width:700px;
+    margin:24px auto;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+mat-card-header{
+    margin-bottom:28px;
+}
+
+.form-header{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.form-icon{
+    width:60px;
+    height:60px;
+    border-radius:16px;
+    background:linear-gradient(135deg,#3f51b5,#6a5ff5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+}
+
+.form-icon mat-icon{
+    font-size:30px;
+    width:30px;
+    height:30px;
+}
+
+mat-card-title{
+    font-size:22px;
+    font-weight:600;
+}
+
+mat-card-subtitle{
+    margin-top:4px;
+    color:#64748b;
+}
+
+.full-width{
+    width:100%;
+    margin-bottom:18px;
+}
+
+mat-form-field mat-icon{
+    color:#64748b;
+    margin-right:8px;
+}
+
+.form-section{
+    margin-bottom:18px;
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+    font-weight:600;
+    color:#334155;
+    margin-bottom:14px;
+}
+
+.section-title mat-icon{
+    color:#3f51b5;
+}
+
+.form-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:14px;
+    margin-top:28px;
+    padding-top:20px;
+    border-top:1px solid #edf2f7;
+}
+
+.form-actions button{
+    min-width:150px;
+}
+
+.form-actions button mat-icon{
+    margin-right:6px;
+}
+
+@media(max-width:600px){
+
+.manager-form-card{
+    margin:12px;
+}
+
+.form-header{
+    flex-direction:column;
+    text-align:center;
+}
+
+.form-actions{
+    flex-direction:column-reverse;
+}
+
+.form-actions button{
+    width:100%;
+}
+
+}

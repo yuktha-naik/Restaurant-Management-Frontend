@@ -1,3 +1,130 @@
-.full-width { width: 100%; }
-mat-card-header { display: flex; align-items: center; margin-bottom: 16px; }
-mat-card-content { overflow-x: auto; }
+.manager-card{
+    padding:6px;
+}
+
+.header-content{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+mat-card-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.full-width{
+    width:100%;
+}
+
+mat-card-content{
+    overflow-x:auto;
+}
+
+.summary-card{
+    background:linear-gradient(135deg,#3f51b5,#6a5ff5);
+    color:#fff;
+    padding:22px;
+    border-radius:18px;
+    margin-bottom:24px;
+}
+
+.summary-label{
+    font-size:13px;
+    opacity:.9;
+}
+
+.summary-value{
+    margin-top:6px;
+    font-size:34px;
+    font-weight:700;
+}
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+.manager-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.manager-table th{
+    background:#f8fafc;
+    padding:16px;
+    text-align:left;
+    font-size:13px;
+    color:#64748b;
+    text-transform:uppercase;
+    border-bottom:2px solid #e5e7eb;
+}
+
+.manager-table td{
+    padding:18px 16px;
+    border-bottom:1px solid #edf2f7;
+}
+
+.manager-table tbody tr{
+    transition:.25s;
+}
+
+.manager-table tbody tr:hover{
+    background:#f8fbff;
+}
+
+.manager-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#3f51b5,#6a5ff5);
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:600;
+    text-transform:uppercase;
+}
+
+.empty-state{
+    padding:60px 20px;
+    text-align:center;
+}
+
+.empty-state mat-icon{
+    font-size:64px;
+    width:64px;
+    height:64px;
+    color:#cbd5e1;
+    margin-bottom:14px;
+}
+
+.empty-state h3{
+    margin:0;
+}
+
+.empty-state p{
+    margin-top:8px;
+    color:#64748b;
+}
+
+@media(max-width:768px){
+
+.header-content{
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+.summary-card{
+    text-align:center;
+}
+
+}

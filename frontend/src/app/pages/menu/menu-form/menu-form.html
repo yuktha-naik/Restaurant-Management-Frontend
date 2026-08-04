@@ -1,64 +1,162 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="menu-form-card">
+
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
-        {{ isEditMode ? 'Edit Menu Item' : 'Add Menu Item' }}
-      </mat-card-title>
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'restaurant_menu' }}</mat-icon>
+        </div>
+
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Edit Menu Item' : 'Add Menu Item' }}
+          </mat-card-title>
+
+          <mat-card-subtitle>
+            {{ isEditMode
+              ? 'Update menu item information'
+              : 'Create a new menu item' }}
+          </mat-card-subtitle>
+        </div>
+
+      </div>
+
     </mat-card-header>
+
     <mat-card-content>
+
       <form [formGroup]="form" (ngSubmit)="save()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Item Name</mat-label>
-          <input matInput formControlName="name" />
-          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
-            <mat-error>Item name is required</mat-error>
-          }
-        </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Category</mat-label>
-          <mat-select formControlName="category">
-            @for (c of categories; track c) {
-              <mat-option [value]="c">{{ c }}</mat-option>
+        <div class="form-section">
+
+          <div class="section-title">
+            <mat-icon>restaurant</mat-icon>
+            Menu Details
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Item Name</mat-label>
+
+            <mat-icon matPrefix>fastfood</mat-icon>
+
+            <input
+              matInput
+              formControlName="name" />
+
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error>Item name is required</mat-error>
             }
-          </mat-select>
-        </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Price</mat-label>
-          <input matInput type="number" step="0.01" formControlName="price" />
-          @if (form.controls.price.invalid && form.controls.price.touched) {
-            <mat-error>Price must be greater than 0</mat-error>
-          }
-        </mat-form-field>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Manager</mat-label>
-          <mat-select formControlName="managerId">
-            @for (m of managers; track m.managerId) {
-              <mat-option [value]="m.managerId">{{ m.name }}</mat-option>
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Category</mat-label>
+
+            <mat-icon matPrefix>category</mat-icon>
+
+            <mat-select formControlName="category">
+
+              @for (c of categories; track c) {
+                <mat-option [value]="c">
+                  {{ c }}
+                </mat-option>
+              }
+
+            </mat-select>
+
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Price</mat-label>
+
+            <mat-icon matPrefix>currency_rupee</mat-icon>
+
+            <input
+              matInput
+              type="number"
+              step="0.01"
+              formControlName="price" />
+
+            @if (form.controls.price.invalid && form.controls.price.touched) {
+              <mat-error>Price must be greater than 0</mat-error>
             }
-          </mat-select>
-          @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
-            <mat-error>Manager is required</mat-error>
-          }
-          @if (form.controls.managerId.hasError('min') && form.controls.managerId.touched) {
-            <mat-error>Please select a manager</mat-error>
-          }
-        </mat-form-field>
 
-        <div class="available-row">
-          <mat-checkbox formControlName="available">Available</mat-checkbox>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Manager</mat-label>
+
+            <mat-icon matPrefix>manage_accounts</mat-icon>
+
+            <mat-select formControlName="managerId">
+
+              @for (m of managers; track m.managerId) {
+                <mat-option [value]="m.managerId">
+                  {{ m.name }}
+                </mat-option>
+              }
+
+            </mat-select>
+
+            @if (form.controls.managerId.hasError('required') && form.controls.managerId.touched) {
+              <mat-error>Manager is required</mat-error>
+            }
+
+            @if (form.controls.managerId.hasError('min') && form.controls.managerId.touched) {
+              <mat-error>Please select a manager</mat-error>
+            }
+
+          </mat-form-field>
+
+        </div>
+
+        <div class="availability-card">
+
+          <mat-checkbox formControlName="available">
+            Item Available for Customers
+          </mat-checkbox>
+
         </div>
 
         <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
-          <button mat-raised-button color="primary" type="submit">
-            {{ isEditMode ? 'Update' : 'Create' }}
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="cancel()">
+
+            <mat-icon>close</mat-icon>
+
+            Cancel
+
           </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit">
+
+            <mat-icon>
+              {{ isEditMode ? 'save' : 'check_circle' }}
+            </mat-icon>
+
+            {{ isEditMode ? 'Update Item' : 'Create Item' }}
+
+          </button>
+
         </div>
+
       </form>
+
     </mat-card-content>
+
   </mat-card>
+
 </div>

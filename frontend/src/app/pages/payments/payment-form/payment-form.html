@@ -1,51 +1,139 @@
 <div class="page-container">
-  <mat-card>
+
+  <mat-card class="payment-form-card">
+
     <mat-card-header>
-      <mat-card-title>
-        <mat-icon>{{ isEditMode ? 'edit' : 'payments' }}</mat-icon>
-        {{ isEditMode ? 'Edit Payment' : 'Record Payment' }}
-      </mat-card-title>
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'payments' }}</mat-icon>
+        </div>
+
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Edit Payment' : 'Record Payment' }}
+          </mat-card-title>
+
+          <mat-card-subtitle>
+            {{ isEditMode
+              ? 'Update payment details'
+              : 'Complete customer payment securely' }}
+          </mat-card-subtitle>
+        </div>
+
+      </div>
+
     </mat-card-header>
 
     <mat-card-content>
+
       <form [formGroup]="form" (ngSubmit)="save()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Order</mat-label>
-          <mat-select formControlName="orderId">
-            @for (order of orders; track order.orderId) {
-              <mat-option [value]="order.orderId">
-                #{{ order.orderId }} — {{ order.totalAmount | currency }}
-              </mat-option>
+
+        <div class="form-section">
+
+          <div class="section-title">
+            <mat-icon>receipt_long</mat-icon>
+            Payment Information
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Order</mat-label>
+
+            <mat-icon matPrefix>shopping_cart</mat-icon>
+
+            <mat-select formControlName="orderId">
+
+              @for (order of orders; track order.orderId) {
+
+                <mat-option [value]="order.orderId">
+
+                  #{{ order.orderId }}
+                  —
+                  {{ order.totalAmount | currency:'INR':'symbol':'1.0-2' }}
+
+                </mat-option>
+
+              }
+
+            </mat-select>
+
+            @if (form.controls.orderId.invalid && form.controls.orderId.touched) {
+              <mat-error>Order is required</mat-error>
             }
-          </mat-select>
-          @if (form.controls.orderId.invalid && form.controls.orderId.touched) {
-            <mat-error>Order is required</mat-error>
-          }
-        </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Amount</mat-label>
-          <input matInput type="number" step="0.01" formControlName="amount" />
-          @if (form.controls.amount.invalid && form.controls.amount.touched) {
-            <mat-error>Amount must be greater than 0</mat-error>
-          }
-        </mat-form-field>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Payment Method</mat-label>
-          <input matInput formControlName="paymentMethod" />
-          @if (form.controls.paymentMethod.invalid && form.controls.paymentMethod.touched) {
-            <mat-error>Payment method is required</mat-error>
-          }
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Amount</mat-label>
+
+            <mat-icon matPrefix>currency_rupee</mat-icon>
+
+            <input
+              matInput
+              type="number"
+              step="0.01"
+              formControlName="amount" />
+
+            @if (form.controls.amount.invalid && form.controls.amount.touched) {
+              <mat-error>Amount must be greater than 0</mat-error>
+            }
+
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+
+            <mat-label>Payment Method</mat-label>
+
+            <mat-icon matPrefix>account_balance_wallet</mat-icon>
+
+            <input
+              matInput
+              formControlName="paymentMethod"
+              placeholder="Cash / Card / UPI" />
+
+            @if (form.controls.paymentMethod.invalid && form.controls.paymentMethod.touched) {
+              <mat-error>Payment method is required</mat-error>
+            }
+
+          </mat-form-field>
+
+        </div>
 
         <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
-          <button mat-raised-button color="primary" type="submit">
-            {{ isEditMode ? 'Update' : 'Record Payment' }}
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="cancel()">
+
+            <mat-icon>close</mat-icon>
+
+            Cancel
+
           </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit">
+
+            <mat-icon>
+              {{ isEditMode ? 'save' : 'payments' }}
+            </mat-icon>
+
+            {{ isEditMode ? 'Update Payment' : 'Record Payment' }}
+
+          </button>
+
         </div>
+
       </form>
+
     </mat-card-content>
+
   </mat-card>
+
 </div>

@@ -1,85 +1,181 @@
 <div class="login-wrapper">
-  <mat-card class="login-card">
-    <div class="portal-switch">
-      <button mat-stroked-button type="button" routerLink="/customer">Customer</button>
-      <button mat-flat-button type="button" routerLink="/staff/login">Staff</button>
+
+  <div class="login-left">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        <mat-icon>restaurant</mat-icon>
+      </div>
+
+      <h1>Restaurant Management System</h1>
+
+      <p>
+        Manage reservations, orders, payments and restaurant operations from one place.
+      </p>
+
+      <div class="feature-list">
+
+        <div class="feature">
+          <mat-icon>event_available</mat-icon>
+          <span>Reservation Management</span>
+        </div>
+
+        <div class="feature">
+          <mat-icon>table_restaurant</mat-icon>
+          <span>Smart Table Allocation</span>
+        </div>
+
+        <div class="feature">
+          <mat-icon>payments</mat-icon>
+          <span>Secure Payment Tracking</span>
+        </div>
+
+      </div>
+
     </div>
 
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon class="login-icon">restaurant</mat-icon>
-        Staff Login
-      </mat-card-title>
-      <mat-card-subtitle>
-        Manager and waiter accounts sign in here — your role is detected automatically
-      </mat-card-subtitle>
-    </mat-card-header>
+  </div>
 
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onLogin()">
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
+  <div class="login-right">
 
-          <input
-            matInput
-            formControlName="email"
-            type="email"
-            placeholder="you@example.com">
+    <mat-card class="login-card">
 
-          <mat-icon matSuffix>email</mat-icon>
-
-          @if (
-            form.controls['email'].hasError('required') &&
-            form.controls['email'].touched
-          ) {
-            <mat-error>Email is required</mat-error>
-          }
-
-          @if (
-            form.controls['email'].hasError('email') &&
-            form.controls['email'].touched
-          ) {
-            <mat-error>Enter a valid email address</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
-
-          <input
-            matInput
-            formControlName="password"
-            type="password">
-
-          <mat-icon matSuffix>lock</mat-icon>
-
-          @if (
-            form.controls['password'].hasError('required') &&
-            form.controls['password'].touched
-          ) {
-            <mat-error>Password is required</mat-error>
-          }
-        </mat-form-field>
+      <div class="portal-switch">
 
         <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          class="full-width login-btn"
-          [disabled]="form.invalid || submitting()">
+          mat-stroked-button
+          type="button"
+          routerLink="/customer">
 
-          <mat-icon>login</mat-icon>
-
-          {{ submitting() ? 'Signing in...' : 'Sign In' }}
+          Customer
 
         </button>
 
-        <p class="alt-link">
-          Walk-in customer? <a routerLink="/customer">Use phone check-in</a>
-        </p>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          routerLink="/staff/login">
 
-      </form>
-    </mat-card-content>
-  </mat-card>
+          Staff
+
+        </button>
+
+      </div>
+
+      <mat-card-header>
+
+        <mat-card-title>
+
+          Staff Login
+
+        </mat-card-title>
+
+        <mat-card-subtitle>
+
+          Login as Manager or Waiter
+
+        </mat-card-subtitle>
+
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <form
+          [formGroup]="form"
+          (ngSubmit)="onLogin()">
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width">
+
+            <mat-label>Email</mat-label>
+
+            <mat-icon matPrefix>mail</mat-icon>
+
+            <input
+              matInput
+              formControlName="email"
+              type="email"
+              placeholder="you@example.com">
+
+            @if (
+            form.controls['email'].hasError('required') &&
+            form.controls['email'].touched
+            ) {
+
+            <mat-error>Email is required</mat-error>
+
+            }
+
+            @if (
+            form.controls['email'].hasError('email') &&
+            form.controls['email'].touched
+            ) {
+
+            <mat-error>Enter a valid email</mat-error>
+
+            }
+
+          </mat-form-field>
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width">
+
+            <mat-label>Password</mat-label>
+
+            <mat-icon matPrefix>lock</mat-icon>
+
+            <input
+              matInput
+              type="password"
+              formControlName="password">
+
+            @if (
+            form.controls['password'].hasError('required') &&
+            form.controls['password'].touched
+            ) {
+
+            <mat-error>Password is required</mat-error>
+
+            }
+
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            class="login-btn"
+            type="submit"
+            [disabled]="form.invalid || submitting()">
+
+            <mat-icon>login</mat-icon>
+
+            {{ submitting() ? 'Signing In...' : 'Sign In' }}
+
+          </button>
+
+          <p class="alt-link">
+
+            Walk-in customer?
+
+            <a routerLink="/customer">
+
+              Customer Portal
+
+            </a>
+
+          </p>
+
+        </form>
+
+      </mat-card-content>
+
+    </mat-card>
+
+  </div>
+
 </div>

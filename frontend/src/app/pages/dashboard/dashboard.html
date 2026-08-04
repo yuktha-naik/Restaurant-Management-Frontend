@@ -1,69 +1,224 @@
 <div class="page-container">
-  <h1 class="welcome-heading">
-    <mat-icon>dashboard</mat-icon>
-    Welcome, {{ userName }}
-  </h1>
-  <p class="role-badge">Role: {{ authService.getRole() }}</p>
+
+  <section class="dashboard-hero">
+
+    <div>
+
+      <span class="hero-badge">
+        <mat-icon>verified_user</mat-icon>
+        {{ authService.getRole() }}
+      </span>
+
+      <h1>
+        Welcome back,
+        <span>{{ userName }}</span>
+        👋
+      </h1>
+
+      <p>
+        Manage your restaurant operations efficiently from one central dashboard.
+      </p>
+
+    </div>
+
+    <div class="hero-logo">
+      <mat-icon>restaurant</mat-icon>
+    </div>
+
+  </section>
 
   @if (isCustomer) {
+
     <div class="card-grid">
-      <mat-card class="stat-card" routerLink="/reservations/new">
+
+      <mat-card class="dashboard-card" routerLink="/reservations/new">
+
         <mat-card-content>
-          <mat-icon class="stat-icon" style="color:#9c27b0">event_seat</mat-icon>
-          <div class="stat-label">Check In</div>
-          <div class="stat-sub">Enter your details and get a table</div>
+
+          <div class="icon-box purple">
+            <mat-icon>event_seat</mat-icon>
+          </div>
+
+          <h3>Check In</h3>
+
+          <p>Reserve your table instantly.</p>
+
         </mat-card-content>
+
       </mat-card>
-      <mat-card class="stat-card" routerLink="/menu">
+
+      <mat-card class="dashboard-card" routerLink="/menu">
+
         <mat-card-content>
-          <mat-icon class="stat-icon" style="color:#ff5722">menu_book</mat-icon>
-          <div class="stat-label">Menu</div>
-          <div class="stat-sub">Browse available items</div>
+
+          <div class="icon-box orange">
+            <mat-icon>restaurant_menu</mat-icon>
+          </div>
+
+          <h3>Menu</h3>
+
+          <p>Browse today's menu.</p>
+
         </mat-card-content>
+
       </mat-card>
+
     </div>
+
   }
 
   @if (!isCustomer) {
+
     @if (loading()) {
-      <div class="spinner-row">
-        <mat-spinner diameter="40"></mat-spinner>
-        <span>Loading data...</span>
+
+      <div class="loading-box">
+
+        <mat-spinner diameter="42"></mat-spinner>
+
+        <span>Loading Dashboard...</span>
+
       </div>
-    } @else if (backendOffline()) {
-      <div class="offline-banner">
-        <mat-icon class="offline-icon">cloud_off</mat-icon>
-        <div>
-          <strong>Backend is not reachable</strong>
-          <p>Make sure your Spring Boot server is running on <code>http://localhost:8080</code>, then click Retry.</p>
-        </div>
-        <button mat-raised-button color="primary" (click)="loadStats()">
-          <mat-icon>refresh</mat-icon> Retry
-        </button>
-      </div>
-      <div class="card-grid">
-        @for (card of stats(); track card.label) {
-          <mat-card class="stat-card" [routerLink]="card.route">
-            <mat-card-content>
-              <mat-icon class="stat-icon" [style.color]="card.color">{{ card.icon }}</mat-icon>
-              <div class="stat-count">{{ card.count }}</div>
-              <div class="stat-label">{{ card.label }}</div>
-            </mat-card-content>
-          </mat-card>
-        }
-      </div>
-    } @else {
-      <div class="card-grid">
-        @for (card of stats(); track card.label) {
-          <mat-card class="stat-card" [routerLink]="card.route">
-            <mat-card-content>
-              <mat-icon class="stat-icon" [style.color]="card.color">{{ card.icon }}</mat-icon>
-              <div class="stat-count">{{ card.count }}</div>
-              <div class="stat-label">{{ card.label }}</div>
-            </mat-card-content>
-          </mat-card>
-        }
-      </div>
+
     }
+
+    @else if (backendOffline()) {
+
+      <div class="offline-banner">
+
+        <div class="offline-left">
+
+          <mat-icon>cloud_off</mat-icon>
+
+          <div>
+
+            <h3>Backend Offline</h3>
+
+            <p>
+              Spring Boot server is not reachable.
+            </p>
+
+          </div>
+
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="loadStats()">
+
+          <mat-icon>refresh</mat-icon>
+
+          Retry
+
+        </button>
+
+      </div>
+
+      <div class="card-grid">
+
+        @for (card of stats(); track card.label) {
+
+          <mat-card
+            class="dashboard-card"
+            [routerLink]="card.route">
+
+            <mat-card-content>
+
+              <div
+                class="icon-box"
+                [style.color]="card.color">
+
+                <mat-icon>
+
+                  {{ card.icon }}
+
+                </mat-icon>
+
+              </div>
+
+              <div class="count">
+
+                {{ card.count }}
+
+              </div>
+
+              <h3>
+
+                {{ card.label }}
+
+              </h3>
+
+            </mat-card-content>
+
+          </mat-card>
+
+        }
+
+      </div>
+
+    }
+
+    @else {
+
+      <div class="card-grid">
+
+        @for (card of stats(); track card.label) {
+
+          <mat-card
+            class="dashboard-card"
+            [routerLink]="card.route">
+
+            <mat-card-content>
+
+              <div
+                class="icon-box"
+                [style.color]="card.color">
+
+                <mat-icon>
+
+                  {{ card.icon }}
+
+                </mat-icon>
+
+              </div>
+
+              <div class="count">
+
+                {{ card.count }}
+
+              </div>
+
+              <h3>
+
+                {{ card.label }}
+
+              </h3>
+
+            </mat-card-content>
+
+          </mat-card>
+
+        }
+
+      </div>
+
+    }
+
   }
+
 </div>
+<mat-card class="food-fact-card">
+
+  <div class="food-fact-header">
+
+    <mat-icon>restaurant_menu</mat-icon>
+
+    <h3>Food Corner</h3>
+
+  </div>
+
+  <p class="food-fact-text">
+    "{{ randomFoodFact }}"
+  </p>
+
+</mat-card>

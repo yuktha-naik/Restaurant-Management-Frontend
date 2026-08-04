@@ -1,65 +1,173 @@
 <div class="login-wrapper">
-  <mat-card class="login-card">
-    <div class="portal-switch">
-      <button mat-flat-button type="button" routerLink="/customer">Customer</button>
-      <button mat-stroked-button type="button" routerLink="/staff/login">Staff</button>
+
+  <div class="login-left">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        <mat-icon>restaurant</mat-icon>
+      </div>
+
+      <h1>Welcome!</h1>
+
+      <p>
+        Reserve your table, explore our menu and enjoy a hassle-free dining experience.
+      </p>
+
+      <div class="feature-list">
+
+        <div class="feature">
+          <mat-icon>event_available</mat-icon>
+          <span>Quick Table Reservations</span>
+        </div>
+
+        <div class="feature">
+          <mat-icon>restaurant_menu</mat-icon>
+          <span>Explore Today's Menu</span>
+        </div>
+
+        <div class="feature">
+          <mat-icon>payments</mat-icon>
+          <span>Easy Billing & Payments</span>
+        </div>
+
+      </div>
+
     </div>
 
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon class="login-icon">restaurant</mat-icon>
-        Customer Check-In
-      </mat-card-title>
-      <mat-card-subtitle>
-        Enter your phone to continue (new or returning customer)
-      </mat-card-subtitle>
-    </mat-card-header>
+  </div>
 
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="login-right">
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" />
-          <mat-icon matSuffix>person</mat-icon>
-          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
-            <mat-error>Name is required</mat-error>
-          }
-        </mat-form-field>
+    <mat-card class="login-card">
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Phone</mat-label>
-          <input matInput formControlName="phone" placeholder="10-digit number" />
-          <mat-icon matSuffix>phone</mat-icon>
-          @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
-            <mat-error>Phone is required</mat-error>
-          }
-          @if (form.controls.phone.hasError('pattern') && form.controls.phone.touched) {
-            <mat-error>Enter a valid 10-digit phone number</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>City (optional)</mat-label>
-          <input matInput formControlName="city" />
-          <mat-icon matSuffix>location_city</mat-icon>
-        </mat-form-field>
-
+      <div class="portal-switch">
         <button
-          mat-raised-button
+          mat-flat-button
           color="primary"
-          type="submit"
-          class="full-width login-btn"
-          [disabled]="submitting()">
-          <mat-icon>login</mat-icon>
-          {{ submitting() ? 'Please wait...' : 'Continue as Customer' }}
+          routerLink="/customer">
+
+          Customer
+
         </button>
 
-        <p class="alt-link">
-          Staff member? <a routerLink="/staff/login">Use staff sign in</a>
-        </p>
+        <button
+          mat-stroked-button
+          routerLink="/staff/login">
 
-      </form>
-    </mat-card-content>
-  </mat-card>
+          Staff
+
+        </button>
+      </div>
+
+      <mat-card-header>
+
+        <mat-card-title>
+
+          Customer Check-In
+
+        </mat-card-title>
+
+        <mat-card-subtitle>
+
+          Continue with your phone number
+
+        </mat-card-subtitle>
+
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <form
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()">
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width">
+
+            <mat-label>Name</mat-label>
+
+            <mat-icon matPrefix>person</mat-icon>
+
+            <input
+              matInput
+              formControlName="name">
+
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+
+          </mat-form-field>
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width">
+
+            <mat-label>Phone</mat-label>
+
+            <mat-icon matPrefix>call</mat-icon>
+
+            <input
+              matInput
+              formControlName="phone"
+              placeholder="10-digit number">
+
+            @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+              <mat-error>Phone is required</mat-error>
+            }
+
+            @if (form.controls.phone.hasError('pattern') && form.controls.phone.touched) {
+              <mat-error>Enter a valid phone number</mat-error>
+            }
+
+          </mat-form-field>
+
+          <mat-form-field
+            appearance="outline"
+            class="full-width">
+
+            <mat-label>City (Optional)</mat-label>
+
+            <mat-icon matPrefix>location_city</mat-icon>
+
+            <input
+              matInput
+              formControlName="city">
+
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            class="login-btn"
+            type="submit"
+            [disabled]="submitting()">
+
+            <mat-icon>arrow_forward</mat-icon>
+
+            {{ submitting() ? 'Please Wait...' : 'Continue' }}
+
+          </button>
+
+          <p class="alt-link">
+
+            Staff Member?
+
+            <a routerLink="/staff/login">
+
+              Staff Login
+
+            </a>
+
+          </p>
+
+        </form>
+
+      </mat-card-content>
+
+    </mat-card>
+
+  </div>
+
 </div>
