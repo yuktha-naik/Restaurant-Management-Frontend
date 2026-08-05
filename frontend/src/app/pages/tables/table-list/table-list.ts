@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
@@ -82,7 +83,9 @@ export class TableListComponent {
         error: (error) => {
           console.error('TABLE/RESERVATION LOAD ERROR:', error);
           this.loading = false;
-          this.snackBar.open('Failed to load table details', 'Close', { duration: 10000 });
+          this.snackBar.open(this.getErrorMessage(error, 'Failed to load table details'), 'Close', {
+            duration: 10000,
+          });
         },
       });
   }
@@ -146,7 +149,10 @@ export class TableListComponent {
               });
               this.loadTables();
             },
-            error: () => this.snackBar.open('Failed to release table', 'Close', { duration: 10000 }),
+            error: (error) =>
+              this.snackBar.open(this.getErrorMessage(error, 'Failed to release table'), 'Close', {
+                duration: 10000,
+              }),
           });
       });
   }
@@ -165,9 +171,32 @@ export class TableListComponent {
               this.snackBar.open('Table deleted', 'Close', { duration: 10000 });
               this.loadTables();
             },
-            error: () => this.snackBar.open('Failed to delete table', 'Close', { duration: 10000 }),
+            error: (error) =>
+              this.snackBar.open(this.getErrorMessage(error, 'Failed to delete table'), 'Close', {
+                duration: 10000,
+              }),
           });
       });
+  }
+
+  private getErrorMessage(error: HttpErrorResponse | unknown, fallback: string): string {
+    const anyError = error as { error?: string | { message?: string }; message?: string };
+    if (typeof anyError?.error === 'string' && anyError.error.trim()) {
+      return anyError.error;
+    }
+
+    if (anyError?.error && typeof anyError.error === 'object' && 'message' in anyError.error) {
+      const message = (anyError.error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    if (typeof anyError?.message === 'string' && anyError.message.trim()) {
+      return anyError.message;
+    }
+
+    return fallback;
   }
 
   statusColor(status: string): string {

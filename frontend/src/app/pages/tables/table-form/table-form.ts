@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -80,8 +81,10 @@ export class TableFormComponent {
             status: t.status,
             waiterId: t.waiter?.waiterId ?? null,
           }),
-        error: () => {
-          this.snackBar.open('Failed to load table', 'Close', { duration: 10000 });
+        error: (error) => {
+          this.snackBar.open(this.getErrorMessage(error, 'Failed to load table'), 'Close', {
+            duration: 10000,
+          });
           this.router.navigate(['/tables']);
         },
       });
@@ -110,11 +113,33 @@ export class TableFormComponent {
         });
         this.router.navigate(['/tables']);
       },
-      error: () =>
-        this.snackBar.open(`Failed to ${this.isEditMode ? 'update' : 'create'} table`, 'Close', {
-          duration: 10000,
-        }),
+      error: (error) =>
+        this.snackBar.open(
+          this.getErrorMessage(error, `Failed to ${this.isEditMode ? 'update' : 'create'} table`),
+          'Close',
+          { duration: 10000 },
+        ),
     });
+  }
+
+  private getErrorMessage(error: HttpErrorResponse | unknown, fallback: string): string {
+    const anyError = error as { error?: string | { message?: string }; message?: string };
+    if (typeof anyError?.error === 'string' && anyError.error.trim()) {
+      return anyError.error;
+    }
+
+    if (anyError?.error && typeof anyError.error === 'object' && 'message' in anyError.error) {
+      const message = (anyError.error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    if (typeof anyError?.message === 'string' && anyError.message.trim()) {
+      return anyError.message;
+    }
+
+    return fallback;
   }
 
   cancel(): void {
